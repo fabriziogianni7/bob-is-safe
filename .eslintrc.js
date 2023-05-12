@@ -14,9 +14,5 @@ module.exports = {
   rules: {
     "@typescript-eslint/camelcase": "off",
     "@typescript-eslint/no-var-requires": "off",
-    "@typescript-eslint/no-unused-vars": [
-      "error",
-      { ignoreRestSiblings: true },
-    ],
   },
 }
