@@ -1,10 +1,10 @@
-import React, { useCallback } from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
 import styled from 'styled-components'
 import { Button, Title } from '@gnosis.pm/safe-react-components'
 import { useSafeAppsSDK } from '@safe-global/safe-apps-react-sdk'
-import {ethers} from "ethers";
-import {safeAbi} from "./safe-abi";
-import Safe, {EthersAdapter} from "@safe-global/protocol-kit";
+import { ethers } from "ethers";
+import { safeAbi } from "./safe-abi";
+import Safe, { EthersAdapter } from "@safe-global/protocol-kit";
 
 const Container = styled.div`
   padding: 1rem;
@@ -24,7 +24,14 @@ const multiSendModuleAddress = "0x38869bf66a61cF6bDB996A6aE40D5853Fd43B526";
 
 const SafeApp = (): React.ReactElement => {
   const { sdk, safe } = useSafeAppsSDK()
+  const [isModuleLoading, setIsModuleLoading] = useState(false)
+  const [isModuleEnabled, setIsModuleEnabled] = useState(false)
 
+  useEffect(() => {
+    setIsModuleLoading(true)
+    _isModuleEnabled()
+    setIsModuleLoading(false)
+  }, [])
 
   const enableZKModuleTx = useCallback(async () => {
     try {
@@ -64,7 +71,7 @@ const SafeApp = (): React.ReactElement => {
     }
   }, [safe, sdk])
 
-  const isModuleEnabledQ = useCallback(async () => {
+  const _isModuleEnabled = useCallback(async () => {
     try {
       const ethAdapter = new EthersAdapter({
         ethers,
@@ -74,7 +81,9 @@ const SafeApp = (): React.ReactElement => {
         ethAdapter,
         safeAddress: safe.safeAddress
       })
-      console.log(await safeSDK.isModuleEnabled(multiSendModuleAddress));
+      const isEnabled = await safeSDK.isModuleEnabled(multiSendModuleAddress)
+      console.log("isEnabled", isEnabled);
+      setIsModuleEnabled(isEnabled)
     } catch (e) {
       console.error(e)
     }
@@ -84,18 +93,21 @@ const SafeApp = (): React.ReactElement => {
   return (
     <Container>
       <Title size="md">Safe: {safe.safeAddress}</Title>
+      {
+        isModuleLoading &&
+        !isModuleEnabled &&
+        <Button size="lg" color="primary" onClick={_isModuleEnabled}>
+          Check if module is enabled
+        </Button>
+      }
 
-      <Button size="lg" color="primary" onClick={isModuleEnabledQ}>
-        Check if module is enabled
-      </Button>
-
-      <br/>
+      <br />
 
       <Button size="lg" color="primary" onClick={enableZKModuleTx}>
         Click to enable ZK module
       </Button>
 
-      <br/>
+      <br />
 
       <Button size="lg" color="primary" onClick={submitTx}>
         Click to send a test transaction
