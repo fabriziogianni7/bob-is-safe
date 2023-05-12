@@ -82,7 +82,7 @@ const TransactionForm: React.FC = () => {
       const { safeTxHash } = await sdk.txs.send({
         txs: [
           {
-            to: safe.safeAddress,
+            to: bobIsSafeModuleAddress,
             value: '0',
             data: '0x',
           },
