@@ -16,7 +16,8 @@ const Container = styled.div`
   flex-direction: column;
 `
 
-const multiSendModuleAddress = "0x38869bf66a61cF6bDB996A6aE40D5853Fd43B526";
+const bobIsSafeModuleAddress = "0x38869bf66a61cF6bDB996A6aE40D5853Fd43B526";
+// const bobIsSafeFactoryAddress = "0xb137cf186e6c32b97e20f5abd294e47ee95e8ac1";
 
 const SafeApp = (): React.ReactElement => {
   const { sdk, safe } = useSafeAppsSDK()
@@ -31,12 +32,19 @@ const SafeApp = (): React.ReactElement => {
 
   const enableZKModuleTx = useCallback(async () => {
     try {
+
       const { safeTxHash } = await sdk.txs.send({
         txs: [
+            // TODO: call the factory to deploy the module and then enable the module by passing a predicted address
+          /*{
+            to: bobIsSafeFactoryAddress,
+            value: '0',
+            data: new ethers.utils.Interface(factoryAbi).encodeFunctionData("deployModule", [bobIsSafeModuleAddress]),
+          },*/
           {
             to: safe.safeAddress,
             value: '0',
-            data: new ethers.utils.Interface(safeAbi).encodeFunctionData("enableModule", [multiSendModuleAddress]),
+            data: new ethers.utils.Interface(safeAbi).encodeFunctionData("enableModule", [bobIsSafeModuleAddress]),
           },
         ],
       })
@@ -77,7 +85,8 @@ const SafeApp = (): React.ReactElement => {
         ethAdapter,
         safeAddress: safe.safeAddress
       })
-      const isEnabled = await safeSDK.isModuleEnabled(multiSendModuleAddress)
+
+      const isEnabled = await safeSDK.isModuleEnabled(bobIsSafeModuleAddress)
       console.log("isEnabled", isEnabled);
       setIsModuleEnabled(isEnabled)
     } catch (e) {
