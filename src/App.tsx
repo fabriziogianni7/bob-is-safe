@@ -16,10 +16,6 @@ const Container = styled.div`
   flex-direction: column;
 `
 
-const Link = styled.a`
-  margin-top: 8px;
-`
-
 const multiSendModuleAddress = "0x38869bf66a61cF6bDB996A6aE40D5853Fd43B526";
 
 const SafeApp = (): React.ReactElement => {
