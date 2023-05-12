@@ -96,16 +96,10 @@ const SafeApp = (): React.ReactElement => {
       {
         isModuleLoading &&
         !isModuleEnabled &&
-        <Button size="lg" color="primary" onClick={_isModuleEnabled}>
-          Check if module is enabled
+        <Button size="lg" color="primary" onClick={enableZKModuleTx}>
+          Click to enable ZK module
         </Button>
       }
-
-      <br />
-
-      <Button size="lg" color="primary" onClick={enableZKModuleTx}>
-        Click to enable ZK module
-      </Button>
 
       <br />
 
