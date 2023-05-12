@@ -16,7 +16,7 @@ const Container = styled.div`
   flex-direction: column;
 `
 
-const bobIsSafeModuleAddress = "0x38869bf66a61cF6bDB996A6aE40D5853Fd43B526";
+const bobIsSafeModuleAddress = "0x22F03B93cCB647430bA025C97c5340774D046529";
 // const bobIsSafeFactoryAddress = "0xb137cf186e6c32b97e20f5abd294e47ee95e8ac1";
 
 const SafeApp = (): React.ReactElement => {
@@ -61,7 +61,7 @@ const SafeApp = (): React.ReactElement => {
       const { safeTxHash } = await sdk.txs.send({
         txs: [
           {
-            to: safe.safeAddress,
+            to: bobIsSafeModuleAddress,
             value: '0',
             data: '0x',
           },
