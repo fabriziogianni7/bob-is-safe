@@ -22,29 +22,17 @@ const tailLayout = {
 
 const TransactionForm: React.FC = () => {
   const [form] = Form.useForm();
+  const { sdk, safe } = useSafeAppsSDK()
+  const [isModuleLoading, setIsModuleLoading] = useState(false)
+  const [isModuleEnabled, setIsModuleEnabled] = useState(false)
+  const bobIsSafeModuleAddress = "0xa384c43054603c49D1Fa306AC47e3747C49AB93c";
 
-  const onGenderChange = (value: string) => {
-    switch (value) {
-      case 'male':
-        form.setFieldsValue({ note: 'Hi, man!' });
-        break;
-      case 'female':
-        form.setFieldsValue({ note: 'Hi, lady!' });
-        break;
-      case 'other':
-        form.setFieldsValue({ note: 'Hi there!' });
-        break;
-      default:
-    }
-  };
 
   const onFinish = (values: any) => {
     console.log(values);
   };
-  const { sdk, safe } = useSafeAppsSDK()
-  const [isModuleLoading, setIsModuleLoading] = useState(false)
-  const [isModuleEnabled, setIsModuleEnabled] = useState(false)
-  const bobIsSafeModuleAddress = "0x38869bf66a61cF6bDB996A6aE40D5853Fd43B526";
+
+
   useEffect(() => {
     setIsModuleLoading(true)
     _isModuleEnabled()
@@ -108,7 +96,6 @@ const TransactionForm: React.FC = () => {
       })
 
       const isEnabled = await safeSDK.isModuleEnabled(bobIsSafeModuleAddress)
-      console.log("isEnabled", isEnabled);
       setIsModuleEnabled(isEnabled)
     } catch (e) {
       console.error(e)
@@ -119,7 +106,7 @@ const TransactionForm: React.FC = () => {
 
     <div>
       {
-        isModuleEnabled && !isModuleLoading?
+        isModuleEnabled && !isModuleLoading ?
           <Form
             {...layout}
             form={form}
@@ -136,7 +123,7 @@ const TransactionForm: React.FC = () => {
             <Form.Item name="token" label="Token Address" rules={[{ required: true }]}>
               <Select
                 placeholder="Select a option and change input text above"
-                onChange={onGenderChange}
+                onChange={()=>{alert('ok')}}
                 allowClear
               >
                 <Option value="0x..">USDC</Option>
