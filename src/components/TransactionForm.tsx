@@ -143,7 +143,7 @@ const TransactionForm: React.FC = () => {
             }
           </Form.Item>
           <Form.Item {...tailLayout}>
-            <Button type="primary" htmlType="submit">
+            <Button type="primary" htmlType="submit" onClick={submitTx}>
               Send Direct Deposit
             </Button>
           </Form.Item>
