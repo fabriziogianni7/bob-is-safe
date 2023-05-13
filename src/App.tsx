@@ -18,7 +18,7 @@ const Container = styled.div`
 const SafeApp = (): React.ReactElement => {
   return (
     <Container>
-      <Image width={600} height={260} src="/bob-is-safe.png" />
+      <Image width={600} height={260} src="/bob-is-safe.png" preview={false}/>
       <TransactionForm />
     </Container>
   )
