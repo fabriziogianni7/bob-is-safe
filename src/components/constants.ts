@@ -20,7 +20,7 @@ export const TOKEN_OPTIONS: Token[] = [
     decimals: 6,
     symbol: 'USDC',
     icon: 'icon.png',
-    poolPercentage: 3000,
+    poolPercentage: 500,
   },
   {
     address: '0xA',
@@ -48,6 +48,6 @@ export const tailLayout = {
   wrapperCol: { offset: 8, span: 16 },
 }
 
-export const bobIsSafeModuleAddress = '0x8b443dca1908d3b1f4c191073e1732e1784e64ca'
+export const bobIsSafeModuleAddress = '0xCE7EC80ff7993382811d5948CE9d68d32d918f2C'
 export const BOB_TOKEN_CONTRACT_ADDRESS = '0x97a4ab97028466FE67F18A6cd67559BAABE391b8'
 export const receiverZkBobAddress = '38aywFhcqbZmncHA8WM1UwKPgrVnqwsViwRWxbjNGBKtQxwb5YoQtFWUkP1UMgU'

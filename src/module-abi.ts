@@ -187,6 +187,11 @@ export const moduleAbi = [
         name: 'amountOutMin',
         type: 'uint256',
       },
+      {
+        internalType: 'uint256',
+        name: 'amountIn',
+        type: 'uint256',
+      },
     ],
     name: 'paymentInPrivateMode',
     outputs: [],
@@ -250,6 +255,40 @@ export const moduleAbi = [
     name: 'setUp',
     outputs: [],
     stateMutability: 'nonpayable',
+    type: 'function',
+  },
+  {
+    inputs: [
+      {
+        internalType: 'address[]',
+        name: 'path',
+        type: 'address[]',
+      },
+      {
+        internalType: 'uint24',
+        name: 'fee',
+        type: 'uint24',
+      },
+      {
+        internalType: 'uint256',
+        name: 'amountOutMin',
+        type: 'uint256',
+      },
+      {
+        internalType: 'uint256',
+        name: 'amountIn',
+        type: 'uint256',
+      },
+    ],
+    name: 'simpleSwapExactInputSingle',
+    outputs: [
+      {
+        internalType: 'uint256',
+        name: '',
+        type: 'uint256',
+      },
+    ],
+    stateMutability: 'payable',
     type: 'function',
   },
   {

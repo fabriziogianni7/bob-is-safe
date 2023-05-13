@@ -5,18 +5,13 @@ import { ethers } from 'ethers'
 import React, { useCallback, useEffect, useState } from 'react'
 import safeAbi from '../contracts-abi/safe-abi.json'
 import { moduleAbi } from '../module-abi'
-import { BOB_TOKEN_CONTRACT_ADDRESS, bobIsSafeModuleAddress, layout, tailLayout,TOKEN_OPTIONS } from './constants'
+import { BOB_TOKEN_CONTRACT_ADDRESS, bobIsSafeModuleAddress, layout, tailLayout, TOKEN_OPTIONS } from './constants'
 //TODO listen for events:
 // enabled: listen on safe contract enabledModule(addr module) (abi safe)
 // emit ModuleProxyCreation(proxy, masterCopy); (deploy module from factory)
 // emit depositSuccess(avatar, _amount);  (safe address, amount)
 
 const { Option } = Select
-
-
-
-
-
 
 const TransactionForm: React.FC = () => {
   const [form] = Form.useForm()
@@ -33,7 +28,7 @@ const TransactionForm: React.FC = () => {
     if (!isModuleEnabled) {
       _setIsModuleEnabled()
     }
-    const provider = new ethers.providers.Web3Provider(window.ethereum);
+    const provider = new ethers.providers.Web3Provider(window.ethereum)
     const moduleContract = new ethers.Contract(bobIsSafeModuleAddress, safeAbi, provider)
     setModuleContract(moduleContract)
   }, [isModuleEnabled])
@@ -85,16 +80,7 @@ const TransactionForm: React.FC = () => {
 
   const submitTx = async () => {
     try {
-
       const token = TOKEN_OPTIONS[tokenIndex]
-      // console.log([
-      //   safe.safeAddress,
-      //   ethers.utils.parseUnits(amount, token.decimals),
-      //   zkBobAddress,
-      //   token.address === BOB_TOKEN_CONTRACT_ADDRESS ? [] : [token.address, BOB_TOKEN_CONTRACT_ADDRESS],
-      //   token.address === BOB_TOKEN_CONTRACT_ADDRESS ? 0 : token.poolPercentage,
-      //   0,
-      // ])
       const { safeTxHash } = await sdk.txs.send({
         txs: [
           /*{
@@ -114,6 +100,7 @@ const TransactionForm: React.FC = () => {
               zkBobAddress,
               token.address === BOB_TOKEN_CONTRACT_ADDRESS ? [] : [token.address, BOB_TOKEN_CONTRACT_ADDRESS],
               token.address === BOB_TOKEN_CONTRACT_ADDRESS ? 0 : token.poolPercentage,
+              0,
               0,
             ]),
           },
