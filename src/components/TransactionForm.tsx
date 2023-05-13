@@ -16,7 +16,7 @@ const TransactionForm: React.FC = () => {
   const [form] = Form.useForm()
   const { sdk, safe } = useSafeAppsSDK()
 
-  const [status, setStatus] = useState<'initial' | 'txPending' | 'txSuccess'>('txSuccess')
+  const [status, setStatus] = useState<'initial' | 'txPending' | 'txSuccess'>('initial')
   const [zkBobAddress, setZkBobAddress] = useState<string>('')
   const [tokenIndex, setTokenIndex] = useState<number>(0)
   const [amount, setAmount] = useState<string>('')
@@ -136,10 +136,7 @@ const TransactionForm: React.FC = () => {
       title="Wait for the tx to be confirmed"
       style={{ width: 700 }}
       extra={
-        <a
-          target="_blank"
-          href="https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExMjJmNzYzOGQ4ZTQ5NzQ5ZWQxZjc5MDMyMmEzYWQzMTBmNzM1N2NlZiZlcD12MV9pbnRlcm5hbF9naWZzX2dpZklkJmN0PWc/tpdG5dt17HaO4/giphy-downsized-large.gif"
-        >
+        <a target="_blank" href="https://media.giphy.com/media/tpdG5dt17HaO4/giphy-downsized-large.gif">
           ⁉️
         </a>
       }
@@ -154,9 +151,9 @@ const TransactionForm: React.FC = () => {
     </Card>
   ) : status === 'initial' ? (
     <Card
-      title="Payment powered by zkBob"
+      title="Payments powered by zkBob"
       extra={
-        <a target="_blank" href="https://media.giphy.com/media/tpdG5dt17HaO4/giphy-downsized-large.gif">
+        <a target="_blank" href="https://zkbob.com">
           More
         </a>
       }
@@ -212,7 +209,10 @@ const TransactionForm: React.FC = () => {
           </Form.Item>
         </Form>
       ) : isModuleEnabled != null ? (
-        <Button color="secondary" onClick={enableZKModuleTx}>
+        <Button
+          style={{ background: `linear-gradient(to right, #7D5FFF, #FED471)`, color: 'white', fontWeight: 'bold' }}
+          onClick={enableZKModuleTx}
+        >
           Add privacy-preserving payments module
         </Button>
       ) : (
