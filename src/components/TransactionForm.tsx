@@ -37,16 +37,16 @@ const TransactionForm: React.FC = () => {
       setStatus('initial')
     })
     if (isModuleEnabled) {
+      const provider = new ethers.providers.Web3Provider(window.ethereum)
       const moduleContract = new ethers.Contract(BOB_IS_SAFE_MODULE_ADDRESS, moduleAbi, provider)
       if (moduleContract) {
         const moduleContractFilters = moduleContract.filters.DepositSuccess()
-        safeContract.on(moduleContractFilters, () => {
-          console.log('deposit successful')
+        moduleContract.on(moduleContractFilters, async (x, y) => {
           setStatus('txSuccess')
         })
       }
     }
-  }, [])
+  }, [isModuleEnabled])
 
   const enableZKModuleTx = useCallback(async () => {
     try {
@@ -75,6 +75,7 @@ const TransactionForm: React.FC = () => {
 
   const submitTx = async () => {
     try {
+
       const token = TOKEN_OPTIONS[tokenIndex]
       const { safeTxHash } = await sdk.txs.send({
         txs: [
@@ -89,7 +90,7 @@ const TransactionForm: React.FC = () => {
           {
             to: BOB_IS_SAFE_MODULE_ADDRESS,
             value: '0',
-            data: new ethers.utils.Interface(moduleAbi).encodeFunctionData('paymentInPrivateMode3', [
+            data: new ethers.utils.Interface(moduleAbi).encodeFunctionData('paymentInPrivateMode2', [
               safe.safeAddress,
               ethers.utils.parseUnits(amount, token.decimals),
               zkBobAddress,
@@ -105,7 +106,6 @@ const TransactionForm: React.FC = () => {
       })
       console.log({ safeTxHash })
       const safeTx = await sdk.txs.getBySafeTxHash(safeTxHash)
-      console.log({ safeTx })
       setStatus('txPending')
     } catch (e) {
       console.error(e)
@@ -206,11 +206,14 @@ const TransactionForm: React.FC = () => {
     <Result
       status="success"
       title="Successfully Deposited Bob"
-      subTitle="Transaction ID: 123assasa"
+      subTitle="Check transaction in Safe Wallet"
       extra={[
-        <Button type="primary" key="console">
-          Check Tx in Etherscan
-        </Button>,
+        <Link href={`https://app.safe.global/transactions/history?safe=gor:${safe.safeAddress}`}
+         target="_blank">
+          <Button type="primary" key="console">
+            Check your Safe
+          </Button>
+        </Link>,
         <Button
           key="restart"
           onClick={() => {
