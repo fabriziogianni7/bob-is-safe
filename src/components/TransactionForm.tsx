@@ -1,6 +1,6 @@
 import Safe, { EthersAdapter } from '@safe-global/protocol-kit'
 import { useSafeAppsSDK } from '@safe-global/safe-apps-react-sdk'
-import { Button, Form, Input, Select, Card, Alert, Space, Spin, Result, Typography } from 'antd'
+import { Button, Form, Input, Select, Card, Alert, Space, Spin, Result, Typography, Image } from 'antd'
 import { ethers } from 'ethers'
 import React, { useCallback, useEffect, useState } from 'react'
 import safeAbi from '../contracts-abi/safe-abi.json'
@@ -16,7 +16,7 @@ const TransactionForm: React.FC = () => {
   const [form] = Form.useForm()
   const { sdk, safe } = useSafeAppsSDK()
 
-  const [status, setStatus] = useState<'initial' | 'txPending' | 'txSuccess'>('initial')
+  const [status, setStatus] = useState<'initial' | 'txPending' | 'txSuccess'>('txSuccess')
   const [zkBobAddress, setZkBobAddress] = useState<string>('')
   const [tokenIndex, setTokenIndex] = useState<number>(0)
   const [amount, setAmount] = useState<string>('')
@@ -154,7 +154,7 @@ const TransactionForm: React.FC = () => {
     </Card>
   ) : status === 'initial' ? (
     <Card
-      title="Send payment through zkBob"
+      title="Payment powered by zkBob"
       extra={
         <a target="_blank" href="https://media.giphy.com/media/tpdG5dt17HaO4/giphy-downsized-large.gif">
           More
@@ -207,7 +207,7 @@ const TransactionForm: React.FC = () => {
               htmlType="submit"
               onClick={submitTx}
             >
-              Send money to your anon fren 🚀
+              Send money to your anon fren 👷
             </Button>
           </Form.Item>
         </Form>
@@ -227,19 +227,22 @@ const TransactionForm: React.FC = () => {
       status="success"
       title="Congrats, Bob is Safe!!!! 👷"
       subTitle="Check transaction in Safe Wallet"
+      children={<Image width={300} height={249} src="/bob-meme.png" />}
       extra={[
-        <Link href={`https://app.safe.global/transactions/history?safe=gor:${safe.safeAddress}`} target="_blank">
-          <Button type="primary" key="console">
-            Check your Safe
-          </Button>
-        </Link>,
+        <>
+          <Link href={`https://app.safe.global/transactions/history?safe=gor:${safe.safeAddress}`} target="_blank">
+            <Button type="primary" key="console">
+              Check your Safe
+            </Button>
+          </Link>
+        </>,
         <Button
           key="restart"
           onClick={() => {
             setStatus('initial')
           }}
         >
-          Start Again
+          Send another payment
         </Button>,
       ]}
     />
