@@ -25,13 +25,13 @@ export const TOKEN_OPTIONS: Token[] = [
     poolFee: 500,
   },
   {
-    address: '0xA',
+    address: '0xcbe9771ed31e761b744d3cb9ef78a1f32dd99211',
     decimals: 18,
     symbol: 'GHO',
     icon: '/coin-logo/gho-logo.png',
   },
   {
-    address: '0xA68AbBb4e36b18A16732CF6d42E826AAA27F52Fc',
+    address: '0x328507DC29C95c170B56a1b3A758eB7a9E73455c',
     decimals: 18,
     symbol: 'APE',
     icon: '/coin-logo/ape-logo.png',
