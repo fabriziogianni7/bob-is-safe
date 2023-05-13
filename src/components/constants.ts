@@ -25,20 +25,22 @@ export const TOKEN_OPTIONS: Token[] = [
     poolFee: 500,
   },
   {
-    address: '0xA',
+    address: '0xcbe9771ed31e761b744d3cb9ef78a1f32dd99211',
     decimals: 18,
     symbol: 'GHO',
     icon: '/coin-logo/gho-logo.png',
   },
   {
-    address: '0xA68AbBb4e36b18A16732CF6d42E826AAA27F52Fc',
+    address: '0x328507DC29C95c170B56a1b3A758eB7a9E73455c',
     decimals: 18,
     symbol: 'APE',
     icon: '/coin-logo/ape-logo.png',
   },
 ]
 
-export const BOB_IS_SAFE_MODULE_ADDRESS = '0x2603b593d6277cd8801d4a01e88c7f3fad842592'
+export const ZKBOB_ADDRESS_PREFIX_REGEX = /^zkbob_[A-Za-z\d]+:[A-Za-z\d]+$/
+
+export const BOB_IS_SAFE_MODULE_ADDRESS = '0xE7E46c2963Fda3c9390AB63f5c3713F6eF96Fb7F'
 
 export const BOB_TOKEN_CONTRACT_ADDRESS = '0x97a4ab97028466FE67F18A6cd67559BAABE391b8'
 

@@ -1,6 +1,6 @@
 import Safe, { EthersAdapter } from '@safe-global/protocol-kit'
 import { useSafeAppsSDK } from '@safe-global/safe-apps-react-sdk'
-import { Button, Form, Input, Select, Card, Alert, Space, Spin, Result, Typography } from 'antd'
+import { Button, Form, Input, Select, Card, Alert, Space, Spin, Result, Typography, Image } from 'antd'
 import { ethers } from 'ethers'
 import React, { useCallback, useEffect, useState } from 'react'
 import safeAbi from '../contracts-abi/safe-abi.json'
@@ -9,6 +9,7 @@ import factoryAbi from '../contracts-abi/factory-abi.json'
 import masterCopyAbi from '../contracts-abi/master-copy-abi.json'
 import { BOB_TOKEN_CONTRACT_ADDRESS, TOKEN_OPTIONS, MODULE_FACTORY_CONTRACT_ADDRESS, MASTER_COPY_CONTRACT } from './constants'
 import { layout, tailLayout } from './styles'
+import { removeZkbobNetworkPrefix } from './helpers'
 import { keccak256 } from 'ethers/lib/utils'
 
 const { Option } = Select
@@ -66,7 +67,7 @@ const TransactionForm: React.FC = () => {
       const provider = new ethers.providers.Web3Provider(window.ethereum)
       const signer = await provider.getSigner()
       const factoryContract = new ethers.Contract(MODULE_FACTORY_CONTRACT_ADDRESS, factoryAbi, signer)
-      
+
       const factoryContractFilters = factoryContract.filters.ModuleProxyCreation()
       factoryContract.on(factoryContractFilters, (address,y) => {
         console.log("ADDRESSSSS", address,y)
@@ -165,7 +166,15 @@ const TransactionForm: React.FC = () => {
   }, [safe, sdk])
 
   return status === 'txPending' ? (
-    <Card title="Wait for the tx to be confirmed" style={{ width: 700 }} extra={<a href="https://google.com">More</a>}>
+    <Card
+      title="Wait for the tx to be confirmed"
+      style={{ width: 700 }}
+      extra={
+        <a target="_blank" href="https://media.giphy.com/media/tpdG5dt17HaO4/giphy-downsized-large.gif">
+          ⁉️
+        </a>
+      }
+    >
       <Spin size="default">
         <Alert
           message="Transaction is pending"
@@ -176,8 +185,12 @@ const TransactionForm: React.FC = () => {
     </Card>
   ) : status === 'initial' ? (
     <Card
-      title="Send a Direct Deposit using Safe and ZkBob"
-      extra={<a href="https://google.com">More</a>}
+      title="Payments powered by zkBob"
+      extra={
+        <a target="_blank" href="https://zkbob.com">
+          More
+        </a>
+      }
       style={{ width: 700 }}
     >
       {isModuleEnabled && status === 'initial' ? (
@@ -194,11 +207,11 @@ const TransactionForm: React.FC = () => {
           labelAlign="right"
         >
           <Form.Item name="ZkBob Address" label="zKBob Address" rules={[{ required: true }]}>
-            <Input onChange={(e: any) => setZkBobAddress(e.target.value)} />
+            <Input onChange={(e: any) => setZkBobAddress(e.target.value)} placeholder="zkbob_goerli:randomString" />
           </Form.Item>
-          <Form.Item name="Token Address" label="Token Address" rules={[{ required: true }]}>
+          <Form.Item name="Token" label="Token" rules={[{ required: true }]}>
             <Select
-              placeholder="Select a option and change input text above"
+              placeholder="Select one token"
               onChange={(tokenIndex: number) => {
                 setTokenIndex(tokenIndex)
               }}
@@ -217,17 +230,24 @@ const TransactionForm: React.FC = () => {
             </Select>
           </Form.Item>
           <Form.Item name="Amount" label="Amount" rules={[{ required: true }]}>
-            <Input onChange={(e: any) => setAmount(e.target.value)} />
+            <Input type="number" onChange={(e: any) => setAmount(e.target.value)} placeholder="0.7" />
           </Form.Item>
           <Form.Item {...tailLayout}>
-            <Button type="primary" htmlType="submit" onClick={submitTx}>
-              Send Direct Deposit
+            <Button
+              style={{ background: `linear-gradient(to right, #7D5FFF, #FED471)`, color: 'white', fontWeight: 'bold' }}
+              htmlType="submit"
+              onClick={submitTx}
+            >
+              Send money to your anon fren 👷
             </Button>
           </Form.Item>
         </Form>
       ) : isModuleEnabled != null ? (
-        <Button color="secondary" onClick={_deployModule}>
-          Click to enable ZK module
+        <Button
+          style={{ background: `linear-gradient(to right, #7D5FFF, #FED471)`, color: 'white', fontWeight: 'bold' }}
+          onClick={enableZKModuleTx}
+        >
+          Add privacy-preserving payments module
         </Button>
       ) : (
         <Spin size="default">
@@ -239,22 +259,24 @@ const TransactionForm: React.FC = () => {
   ) : (
     <Result
       status="success"
-      title="Successfully Deposited Bob"
+      title="Congrats, Bob is Safe!!!! 👷"
       subTitle="Check transaction in Safe Wallet"
+      children={<Image width={300} height={249} src="/bob-meme.png" />}
       extra={[
-        <Link href={`https://app.safe.global/transactions/history?safe=gor:${safe.safeAddress}`}
-          target="_blank">
-          <Button type="primary" key="console">
-            Check your Safe
-          </Button>
-        </Link>,
+        <>
+          <Link href={`https://app.safe.global/transactions/history?safe=gor:${safe.safeAddress}`} target="_blank">
+            <Button type="primary" key="console">
+              Check your Safe
+            </Button>
+          </Link>
+        </>,
         <Button
           key="restart"
           onClick={() => {
             setStatus('initial')
           }}
         >
-          Start Again
+          Send another payment
         </Button>,
       ]}
     />
