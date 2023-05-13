@@ -5,63 +5,18 @@ import { ethers } from 'ethers'
 import React, { useCallback, useEffect, useState } from 'react'
 import safeAbi from '../contracts-abi/safe-abi.json'
 import { moduleAbi } from '../module-abi'
+import { BOB_TOKEN_CONTRACT_ADDRESS, bobIsSafeModuleAddress, layout, tailLayout,TOKEN_OPTIONS } from './constants'
+//TODO listen for events:
+// enabled: listen on safe contract enabledModule(addr module) (abi safe)
+// emit ModuleProxyCreation(proxy, masterCopy); (deploy module from factory)
+// emit depositSuccess(avatar, _amount);  (safe address, amount)
 
 const { Option } = Select
 
-const layout = {
-  labelCol: {
-    span: 0,
-    color: 'red',
-  },
-  wrapperCol: { span: 14 },
-}
 
-const tailLayout = {
-  wrapperCol: { offset: 8, span: 16 },
-}
 
-const bobIsSafeModuleAddress = '0x8b443dca1908d3b1f4c191073e1732e1784e64ca'
-const BOB_TOKEN_CONTRACT_ADDRESS = '0x97a4ab97028466FE67F18A6cd67559BAABE391b8'
-const receiverZkBobAddress = '38aywFhcqbZmncHA8WM1UwKPgrVnqwsViwRWxbjNGBKtQxwb5YoQtFWUkP1UMgU'
-// const bobIsSafeFactoryAddress = "0xb137cf186e6c32b97e20f5abd294e47ee95e8ac1";
 
-export interface Token {
-  address: string
-  decimals: number
-  symbol: string
-  icon: string
-  poolPercentage?: number
-}
 
-const tokenOptions: { address: string; decimals: number; symbol: string; icon: string; poolPercentage?: number }[] = [
-  {
-    // BOB
-    address: '0x97a4ab97028466FE67F18A6cd67559BAABE391b8',
-    decimals: 18,
-    symbol: 'BOB',
-    icon: 'icon.png',
-  },
-  {
-    // USDC
-    address: '0x07865c6e87b9f70255377e024ace6630c1eaa37f',
-    decimals: 6,
-    symbol: 'USDC',
-    icon: 'icon.png',
-    poolPercentage: 3000,
-  },
-  {
-    address: '0xA',
-    decimals: 18,
-    symbol: 'GHO',
-    icon: 'icon.png',
-  },
-  {
-    address: '0xB',
-    decimals: 18,
-    symbol: 'APE',
-    icon: 'icon.png',
-  },
-]
 
 const TransactionForm: React.FC = () => {
   const [form] = Form.useForm()
@@ -69,12 +24,7 @@ const TransactionForm: React.FC = () => {
 
   const [status, setStatus] = useState<'initial' | 'txPending' | 'txSuccess'>('initial')
   const [zkBobAddress, setZkBobAddress] = useState<string>('')
-  const [token, setToken] = useState<Token>({
-    address: '0x97a4ab97028466FE67F18A6cd67559BAABE391b8',
-    decimals: 18,
-    symbol: 'BOB',
-    icon: 'icon.png',
-  })
+  const [tokenIndex, setTokenIndex] = useState<number>(0)
   const [amount, setAmount] = useState<string>('')
   const [isModuleEnabled, setIsModuleEnabled] = useState(false)
   const [moduleContract, setModuleContract] = useState<any>()
@@ -83,7 +33,7 @@ const TransactionForm: React.FC = () => {
     if (!isModuleEnabled) {
       _setIsModuleEnabled()
     }
-    const provider = new ethers.providers.JsonRpcProvider('https://goerli.infura.io/v3/')
+    const provider = new ethers.providers.Web3Provider(window.ethereum);
     const moduleContract = new ethers.Contract(bobIsSafeModuleAddress, safeAbi, provider)
     setModuleContract(moduleContract)
   }, [isModuleEnabled])
@@ -135,17 +85,16 @@ const TransactionForm: React.FC = () => {
 
   const submitTx = async () => {
     try {
-      console.log('zkBobAddress,', zkBobAddress)
-      console.log('amount,', amount)
-      console.log('safe.safeAddress', safe.safeAddress)
-      console.log([
-        safe.safeAddress,
-        ethers.utils.parseUnits(amount, token.decimals),
-        zkBobAddress,
-        token.address === BOB_TOKEN_CONTRACT_ADDRESS ? [] : [token.address, BOB_TOKEN_CONTRACT_ADDRESS],
-        token.address === BOB_TOKEN_CONTRACT_ADDRESS ? 0 : token.poolPercentage,
-        0,
-      ])
+
+      const token = TOKEN_OPTIONS[tokenIndex]
+      // console.log([
+      //   safe.safeAddress,
+      //   ethers.utils.parseUnits(amount, token.decimals),
+      //   zkBobAddress,
+      //   token.address === BOB_TOKEN_CONTRACT_ADDRESS ? [] : [token.address, BOB_TOKEN_CONTRACT_ADDRESS],
+      //   token.address === BOB_TOKEN_CONTRACT_ADDRESS ? 0 : token.poolPercentage,
+      //   0,
+      // ])
       const { safeTxHash } = await sdk.txs.send({
         txs: [
           /*{
@@ -232,25 +181,26 @@ const TransactionForm: React.FC = () => {
           <Form.Item name="ZkBob Address" label="zKBob Address" rules={[{ required: true }]}>
             <Input onChange={(e: any) => setZkBobAddress(e.target.value)} />
           </Form.Item>
-          <Form.Item name="Amount" label="Amount" rules={[{ required: true }]}>
-            <Input onChange={(e: any) => setAmount(e.target.value)} />
-          </Form.Item>
           <Form.Item name="Token Address" label="Token Address" rules={[{ required: true }]}>
             <Select
               placeholder="Select a option and change input text above"
-              onChange={(token: Token) => {
-                console.log(token)
+              onChange={(tokenIndex: number) => {
+                setTokenIndex(tokenIndex)
               }}
               allowClear
             >
-              {tokenOptions.map((token, index) => (
-                <Option value={token.address} key={token.address}>
+              {TOKEN_OPTIONS.map((token, index) => (
+                <Option value={index} key={index}>
                   {token.symbol}
                 </Option>
               ))}
             </Select>
           </Form.Item>
-          <Form.Item noStyle shouldUpdate={(prevValues, currentValues) => prevValues.gender !== currentValues.gender}>
+          <Form.Item name="Amount" label="Amount" rules={[{ required: true }]}>
+            <Input onChange={(e: any) => setAmount(e.target.value)} />
+          </Form.Item>
+
+          {/* <Form.Item noStyle shouldUpdate={(prevValues, currentValues) => prevValues.gender !== currentValues.gender}>
             {({ getFieldValue }) =>
               getFieldValue('gender') === 'other' ? (
                 <Form.Item name="customizeGender" label="Customize Gender" rules={[{ required: true }]}>
@@ -258,7 +208,7 @@ const TransactionForm: React.FC = () => {
                 </Form.Item>
               ) : null
             }
-          </Form.Item>
+          </Form.Item> */}
           <Form.Item {...tailLayout}>
             <Button type="primary" htmlType="submit" onClick={submitTx}>
               Send Direct Deposit
