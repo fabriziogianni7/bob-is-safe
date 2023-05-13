@@ -30,7 +30,6 @@ const TransactionForm: React.FC = () => {
   const { sdk, safe } = useSafeAppsSDK()
   const [isModuleLoading, setIsModuleLoading] = useState(false)
   const [isModuleEnabled, setIsModuleEnabled] = useState(false)
-  const bobIsSafeModuleAddress = '0xa384c43054603c49D1Fa306AC47e3747C49AB93c'
 
   const onFinish = (values: any) => {
     console.log(values)
