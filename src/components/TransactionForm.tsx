@@ -1,6 +1,6 @@
 import Safe, { EthersAdapter } from '@safe-global/protocol-kit'
 import { useSafeAppsSDK } from '@safe-global/safe-apps-react-sdk'
-import { Button, Form, Input, Select, Card, Alert, Space, Spin, Result ,Typography } from 'antd'
+import { Button, Form, Input, Select, Card, Alert, Space, Spin, Result, Typography } from 'antd'
 import { ethers } from 'ethers'
 import React, { useCallback, useEffect, useState } from 'react'
 import safeAbi from '../contracts-abi/safe-abi.json'
@@ -69,7 +69,7 @@ const TransactionForm: React.FC = () => {
       console.log({ safeTxHash })
     } catch (e) {
       console.error(e)
-      setStatus("initial")
+      setStatus('initial')
     }
   }, [safe, sdk])
 
@@ -89,13 +89,12 @@ const TransactionForm: React.FC = () => {
           {
             to: BOB_IS_SAFE_MODULE_ADDRESS,
             value: '0',
-            data: new ethers.utils.Interface(moduleAbi).encodeFunctionData('paymentInPrivateMode', [
+            data: new ethers.utils.Interface(moduleAbi).encodeFunctionData('paymentInPrivateMode3', [
               safe.safeAddress,
               ethers.utils.parseUnits(amount, token.decimals),
               zkBobAddress,
               token.address === BOB_TOKEN_CONTRACT_ADDRESS ? [] : [token.address, BOB_TOKEN_CONTRACT_ADDRESS],
               token.address === BOB_TOKEN_CONTRACT_ADDRESS ? 0 : token.poolFee,
-              0,
               0,
             ]),
           },
@@ -174,13 +173,11 @@ const TransactionForm: React.FC = () => {
               {TOKEN_OPTIONS.map((token, index) => (
                 <Option value={index} key={index}>
                   {/* <img src={`/coin-logo/bob-logo.png`} alt={token.symbol} /> */}
-                  <Space direction='horizontal'>
-                    <img src={token.icon} alt={token.symbol}
-                      width={20} height={20} />
+                  <Space direction="horizontal">
+                    <img src={token.icon} alt={token.symbol} width={20} height={20} />
 
                     <Text>{token.symbol}</Text>
                   </Space>
-
                 </Option>
               ))}
             </Select>
