@@ -48,11 +48,13 @@ const TransactionForm: React.FC = () => {
     })
     if (isModuleEnabled) {
       const moduleContract = new ethers.Contract(BOB_IS_SAFE_MODULE_ADDRESS, moduleAbi, provider)
-      const moduleContractFilters = moduleContract.filters.DepositSuccess()
-      safeContract.on(moduleContractFilters, () => {
-        console.log("deposit successful")
-        setStatus("txSuccess")
-      })
+      if (moduleContract) {
+        const moduleContractFilters = moduleContract.filters.DepositSuccess()
+        safeContract.on(moduleContractFilters, () => {
+          console.log("deposit successful")
+          setStatus("txSuccess")
+        })
+      }
 
     }
     // const factoryContractFilters = factoryContract.filters.ModuleProxyCreation()
@@ -201,7 +203,12 @@ const TransactionForm: React.FC = () => {
             >
               {TOKEN_OPTIONS.map((token, index) => (
                 <Option value={index} key={index}>
+                  {/* <img src={`/coin-logo/bob-logo.png`} alt={token.symbol} /> */}
+                  <img src={token.icon} alt={token.symbol}
+                  width={20} height={20} />
+                  <Space></Space>
                   {token.symbol}
+
                 </Option>
               ))}
             </Select>

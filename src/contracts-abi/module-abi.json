@@ -186,15 +186,16 @@
 				"internalType": "uint256",
 				"name": "amountOutMin",
 				"type": "uint256"
-			},
-			{
-				"internalType": "uint256",
-				"name": "amountIn",
-				"type": "uint256"
 			}
 		],
 		"name": "paymentInPrivateMode",
-		"outputs": [],
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
 		"stateMutability": "nonpayable",
 		"type": "function"
 	},

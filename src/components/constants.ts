@@ -4,6 +4,8 @@ export type Token = {
   symbol: string
   icon: string
   poolPercentage?: number
+  width?: number
+  height?: number
 }
 
 export const TOKEN_OPTIONS: Token[] = [
@@ -12,32 +14,32 @@ export const TOKEN_OPTIONS: Token[] = [
     address: '0x97a4ab97028466FE67F18A6cd67559BAABE391b8',
     decimals: 18,
     symbol: 'BOB',
-    icon: 'icon.png',
+    icon: '/coin-logo/bob-logo.png',
   },
   {
     // USDC
     address: '0x07865c6e87b9f70255377e024ace6630c1eaa37f',
     decimals: 6,
     symbol: 'USDC',
-    icon: 'icon.png',
+    icon: '/coin-logo/usdc-logo.png',
     poolPercentage: 3000,
   },
   {
     address: '0xA',
     decimals: 18,
     symbol: 'GHO',
-    icon: 'icon.png',
+    icon: '/coin-logo/gho-logo.png',
   },
   {
     address: '0xB',
     decimals: 18,
     symbol: 'APE',
-    icon: 'icon.png',
+    icon: '/coin-logo/ape-logo.png',
   },
 ]
 
 
-export const BOB_IS_SAFE_MODULE_ADDRESS = '0x8b443dca1908d3b1f4c191073e1732e1784e64ca'
+export const BOB_IS_SAFE_MODULE_ADDRESS = '0x8e39a0235fb6475c8ae7d62686e41168a55e1b29'
 
 export const BOB_TOKEN_CONTRACT_ADDRESS = '0x97a4ab97028466FE67F18A6cd67559BAABE391b8'
 
