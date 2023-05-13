@@ -69,6 +69,7 @@ const TransactionForm: React.FC = () => {
       console.log({ safeTxHash })
     } catch (e) {
       console.error(e)
+      setStatus("initial")
     }
   }, [safe, sdk])
 
