@@ -22,7 +22,7 @@ export const TOKEN_OPTIONS: Token[] = [
     decimals: 6,
     symbol: 'USDC',
     icon: '/coin-logo/usdc-logo.png',
-    poolPercentage: 3000,
+    poolPercentage: 500,
   },
   {
     address: '0xA',

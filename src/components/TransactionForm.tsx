@@ -97,16 +97,7 @@ const TransactionForm: React.FC = () => {
 
   const submitTx = async () => {
     try {
-
       const token = TOKEN_OPTIONS[tokenIndex]
-      // console.log([
-      //   safe.safeAddress,
-      //   ethers.utils.parseUnits(amount, token.decimals),
-      //   zkBobAddress,
-      //   token.address === BOB_TOKEN_CONTRACT_ADDRESS ? [] : [token.address, BOB_TOKEN_CONTRACT_ADDRESS],
-      //   token.address === BOB_TOKEN_CONTRACT_ADDRESS ? 0 : token.poolPercentage,
-      //   0,
-      // ])
       const { safeTxHash } = await sdk.txs.send({
         txs: [
           /*{
@@ -126,6 +117,7 @@ const TransactionForm: React.FC = () => {
               zkBobAddress,
               token.address === BOB_TOKEN_CONTRACT_ADDRESS ? [] : [token.address, BOB_TOKEN_CONTRACT_ADDRESS],
               token.address === BOB_TOKEN_CONTRACT_ADDRESS ? 0 : token.poolPercentage,
+              0,
               0,
             ]),
           },
