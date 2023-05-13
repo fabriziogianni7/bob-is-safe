@@ -29,10 +29,10 @@ const TransactionForm: React.FC = () => {
   const [form] = Form.useForm()
   const { sdk, safe } = useSafeAppsSDK()
 
-  const [status, setStatus] = useState<"initial" | "txPending" | "txSuccess">("txSuccess")
+  const [status, setStatus] = useState<"initial" | "txPending" | "txSuccess">("initial")
   const [zkBobAddress, setZkBobAddress] = useState<string>("")
   const [tokenAddress, setTokenAddress] = useState<string>("")
-  const [amount, setAmount] = useState<number>(0)
+  const [amount, setAmount] = useState<string>("")
   const [isModuleEnabled, setIsModuleEnabled] = useState(false)
   const [moduleContract, setModuleContract] = useState<any>()
 
@@ -92,8 +92,11 @@ const TransactionForm: React.FC = () => {
     }
   }, [safe, sdk])
 
-  const submitTx = useCallback(async () => {
+  const submitTx = async () => {
     try {
+      console.log("zkBobAddress,", zkBobAddress)
+      console.log("amount,", amount)
+      console.log("safe.safeAddress", safe.safeAddress)
       const { safeTxHash } = await sdk.txs.send({
         txs: [
           /*{
@@ -108,10 +111,10 @@ const TransactionForm: React.FC = () => {
             to: bobIsSafeModuleAddress,
             value: '0',
             data: new ethers.utils.Interface(moduleAbi).encodeFunctionData('paymentInPrivateMode', [
-              //safe.safeAddress,
-              '0x1358155a15930f89eBc787a34Eb4ccfd9720bC62',
-              ethers.utils.parseUnits('1', 18),
-              receiverZkBobAddress,
+              safe.safeAddress,
+              // '0x1358155a15930f89eBc787a34Eb4ccfd9720bC62',
+              ethers.utils.parseUnits(amount, 18),
+              zkBobAddress,
               [],
               0,
               0,
@@ -129,7 +132,7 @@ const TransactionForm: React.FC = () => {
     } catch (e) {
       console.error(e)
     }
-  }, [safe, sdk])
+  }
 
   const _setIsModuleEnabled = useCallback(async () => {
     try {
@@ -174,19 +177,17 @@ const TransactionForm: React.FC = () => {
               }}
               labelAlign="right">
               <Form.Item name="ZkBob Address" label="zKBob Address" rules={[{ required: true, }]}>
-                <Input onChange={(e:any)=> console.log(e.target.value)}/>
-                {/* <Input onChange={(e:any)=> setZkBobAddress(e.target.value)}/> */}
+                <Input onChange={(e: any) => setZkBobAddress(e.target.value)} />
               </Form.Item>
               <Form.Item name="Amount" label="Amount" rules={[{ required: true }]}>
-                <Input onChange={(e:any)=> setAmount(e.target.value)}/>
+                <Input onChange={(e: any) => setAmount(e.target.value)} />
               </Form.Item>
               <Form.Item name="Token Address" label="Token Address" rules={[{ required: true }]}
               >
                 <Select
                   placeholder="Select a option and change input text above"
-                  onChange={(e:any) => {
-                    setAmount(e)
-                  console.log(e)
+                  onChange={(token: any) => {
+                    setTokenAddress(token)
                   }}
                   allowClear
                 >
