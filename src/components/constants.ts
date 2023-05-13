@@ -29,7 +29,7 @@ export const TOKEN_OPTIONS: Token[] = [
     icon: 'icon.png',
   },
   {
-    address: '0xB',
+    address: '0xA68AbBb4e36b18A16732CF6d42E826AAA27F52Fc',
     decimals: 18,
     symbol: 'APE',
     icon: 'icon.png',
