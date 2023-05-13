@@ -36,18 +36,7 @@ export const TOKEN_OPTIONS: Token[] = [
   },
 ]
 
-export const layout = {
-  labelCol: {
-    span: 0,
-    color: 'red',
-  },
-  wrapperCol: { span: 14 },
-}
 
-export const tailLayout = {
-  wrapperCol: { offset: 8, span: 16 },
-}
-
-export const bobIsSafeModuleAddress = '0x8b443dca1908d3b1f4c191073e1732e1784e64ca'
+export const BOB_IS_SAFE_MODULE_ADDRESS = '0x8b443dca1908d3b1f4c191073e1732e1784e64ca'
 export const BOB_TOKEN_CONTRACT_ADDRESS = '0x97a4ab97028466FE67F18A6cd67559BAABE391b8'
-export const receiverZkBobAddress = '38aywFhcqbZmncHA8WM1UwKPgrVnqwsViwRWxbjNGBKtQxwb5YoQtFWUkP1UMgU'
+export const RECEIVER_ZK_BOB_ADDRESS = '38aywFhcqbZmncHA8WM1UwKPgrVnqwsViwRWxbjNGBKtQxwb5YoQtFWUkP1UMgU'

@@ -1,4 +1,4 @@
-export const factoryAbi = [{"inputs": [], "stateMutability": "nonpayable", "type": "constructor"}, {
+[{"inputs": [], "stateMutability": "nonpayable", "type": "constructor"}, {
     "anonymous": false,
     "inputs": [{"indexed": false, "internalType": "address", "name": "owner", "type": "address"}],
     "name": "AddedOwner",
