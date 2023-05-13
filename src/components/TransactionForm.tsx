@@ -20,7 +20,7 @@ const tailLayout = {
   wrapperCol: { offset: 8, span: 16 },
 }
 
-const bobIsSafeModuleAddress = '0xa384c43054603c49D1Fa306AC47e3747C49AB93c'
+const bobIsSafeModuleAddress = '0x2daa79323f62244acc989b2e05a965613efe788d'
 // const BOB_CONTRACT_ADDRESS = '0x97a4ab97028466FE67F18A6cd67559BAABE391b8'
 const receiverZkBobAddress = '38aywFhcqbZmncHA8WM1UwKPgrVnqwsViwRWxbjNGBKtQxwb5YoQtFWUkP1UMgU'
 // const bobIsSafeFactoryAddress = "0xb137cf186e6c32b97e20f5abd294e47ee95e8ac1";
@@ -96,11 +96,20 @@ const TransactionForm: React.FC = () => {
     try {
       const { safeTxHash } = await sdk.txs.send({
         txs: [
+          /*{
+            to: BOB_CONTRACT_ADDRESS,
+            value: '0',
+            data: new ethers.utils.Interface(bobTokenAbi).encodeFunctionData('approve', [
+              '0xE4C77B7787cC116A5E1549c5BB36DE07732100Bb',
+              ethers.utils.parseUnits('100', 18),
+            ]),
+          },*/
           {
             to: bobIsSafeModuleAddress,
             value: '0',
             data: new ethers.utils.Interface(moduleAbi).encodeFunctionData('paymentInPrivateMode', [
-              safe.safeAddress,
+              //safe.safeAddress,
+              '0x1358155a15930f89eBc787a34Eb4ccfd9720bC62',
               ethers.utils.parseUnits('1', 18),
               receiverZkBobAddress,
               [],
@@ -109,6 +118,9 @@ const TransactionForm: React.FC = () => {
             ]),
           },
         ],
+        /*params: {
+          safeTxGas: 1000000,
+        },*/
       })
       console.log({ safeTxHash })
       const safeTx = await sdk.txs.getBySafeTxHash(safeTxHash)

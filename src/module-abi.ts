@@ -107,9 +107,9 @@ export const moduleAbi = [
         type: 'uint256',
       },
       {
-        internalType: 'bytes',
+        internalType: 'string',
         name: '_rawZkAddress',
-        type: 'bytes',
+        type: 'string',
       },
     ],
     name: 'directDeposit',
