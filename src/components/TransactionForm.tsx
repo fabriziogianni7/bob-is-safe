@@ -4,14 +4,9 @@ import { Button, Form, Input, Select, Card, Alert, Space, Spin, Result ,Typograp
 import { ethers } from 'ethers'
 import React, { useCallback, useEffect, useState } from 'react'
 import safeAbi from '../contracts-abi/safe-abi.json'
-import factoryAbi from '../contracts-abi/factory-abi.json'
 import moduleAbi from '../contracts-abi/module-abi.json'
-import { BOB_TOKEN_CONTRACT_ADDRESS, BOB_IS_SAFE_MODULE_ADDRESS, TOKEN_OPTIONS, MODULE_FACTORY_CONTRACT_ADDRESS } from './constants'
+import { BOB_TOKEN_CONTRACT_ADDRESS, BOB_IS_SAFE_MODULE_ADDRESS, TOKEN_OPTIONS } from './constants'
 import { layout, tailLayout } from './styles'
-//TODO listen for events:
-// enabled: listen on safe contract enabledModule(addr module) (abi safe) DONE!
-// emit ModuleProxyCreation(proxy, masterCopy); (deploy module from factory) from factory contract
-// emit depositSuccess(avatar, _amount);  (safe address, amount) from Module contract
 
 const { Option } = Select
 const { Text, Link } = Typography
@@ -25,49 +20,37 @@ const TransactionForm: React.FC = () => {
   const [tokenIndex, setTokenIndex] = useState<number>(0)
   const [amount, setAmount] = useState<string>('')
   const [isModuleEnabled, setIsModuleEnabled] = useState<boolean | null>()
-  const [moduleContract, setModuleContract] = useState<any>()
 
   useEffect(() => {
     if (!isModuleEnabled) {
       _setIsModuleEnabled()
     }
-
-    // const provider = new ethers.providers.Web3Provider(window.ethereum);
-    // const moduleContract = new ethers.Contract(BOB_IS_SAFE_MODULE_ADDRESS, safeAbi, provider)
-    // setModuleContract(moduleContract)
   }, [isModuleEnabled])
 
   useEffect(() => {
-    const provider = new ethers.providers.Web3Provider(window.ethereum);
+    const provider = new ethers.providers.Web3Provider(window.ethereum)
     const safeContract = new ethers.Contract(safe.safeAddress, safeAbi, provider)
-    // const factoryContract = new ethers.Contract(MODULE_FACTORY_CONTRACT_ADDRESS, factoryAbi, provider)
 
     const safeContractFilters = safeContract.filters.EnabledModule()
     safeContract.on(safeContractFilters, () => {
       setIsModuleEnabled(true)
-      setStatus("initial")
+      setStatus('initial')
     })
     if (isModuleEnabled) {
       const moduleContract = new ethers.Contract(BOB_IS_SAFE_MODULE_ADDRESS, moduleAbi, provider)
       if (moduleContract) {
         const moduleContractFilters = moduleContract.filters.DepositSuccess()
         safeContract.on(moduleContractFilters, () => {
-          console.log("deposit successful")
-          setStatus("txSuccess")
+          console.log('deposit successful')
+          setStatus('txSuccess')
         })
       }
-
     }
-    // const factoryContractFilters = factoryContract.filters.ModuleProxyCreation()
-    // factoryContract.on(factoryContractFilters, () => {
-    //   setIsModuleEnabled(true)
-    //   setStatus("initial")
-    // })
   }, [])
 
   const enableZKModuleTx = useCallback(async () => {
     try {
-      setStatus("txPending")
+      setStatus('txPending')
       const { safeTxHash } = await sdk.txs.send({
         txs: [
           // TODO: call the factory to deploy the module and then enable the module by passing a predicted address
@@ -84,13 +67,6 @@ const TransactionForm: React.FC = () => {
         ],
       })
       console.log({ safeTxHash })
-
-      const safeTx = await sdk.txs.getBySafeTxHash(safeTxHash)
-      // sdk.eth.
-      // if (safeTx) {
-      //   setIsModuleEnabled(true)
-      // }
-      // console.log({ safeTx })
     } catch (e) {
       console.error(e)
     }
@@ -117,7 +93,7 @@ const TransactionForm: React.FC = () => {
               ethers.utils.parseUnits(amount, token.decimals),
               zkBobAddress,
               token.address === BOB_TOKEN_CONTRACT_ADDRESS ? [] : [token.address, BOB_TOKEN_CONTRACT_ADDRESS],
-              token.address === BOB_TOKEN_CONTRACT_ADDRESS ? 0 : token.poolPercentage,
+              token.address === BOB_TOKEN_CONTRACT_ADDRESS ? 0 : token.poolFee,
               0,
               0,
             ]),
@@ -211,16 +187,6 @@ const TransactionForm: React.FC = () => {
           <Form.Item name="Amount" label="Amount" rules={[{ required: true }]}>
             <Input onChange={(e: any) => setAmount(e.target.value)} />
           </Form.Item>
-
-          {/* <Form.Item noStyle shouldUpdate={(prevValues, currentValues) => prevValues.gender !== currentValues.gender}>
-            {({ getFieldValue }) =>
-              getFieldValue('gender') === 'other' ? (
-                <Form.Item name="customizeGender" label="Customize Gender" rules={[{ required: true }]}>
-                  <Input />
-                </Form.Item>
-              ) : null
-            }
-          </Form.Item> */}
           <Form.Item {...tailLayout}>
             <Button type="primary" htmlType="submit" onClick={submitTx}>
               Send Direct Deposit
@@ -231,15 +197,11 @@ const TransactionForm: React.FC = () => {
         <Button color="secondary" onClick={enableZKModuleTx}>
           Click to enable ZK module
         </Button>
-      ) :
+      ) : (
         <Spin size="default">
-          <Alert
-            message="Loading"
-            description="Loading the Safe App"
-            type="info"
-          />
+          <Alert message="Loading" description="Loading the Safe App" type="info" />
         </Spin>
-      }
+      )}
       {/* </Card> */}
     </Card>
   ) : (
