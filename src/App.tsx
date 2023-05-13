@@ -2,6 +2,7 @@ import React from 'react'
 import styled from 'styled-components'
 import 'antd/dist/reset.css'
 import TransactionForm from './components/TransactionForm'
+import { Image } from 'antd'
 
 const Container = styled.div`
   padding: 1rem;
@@ -17,6 +18,10 @@ const Container = styled.div`
 const SafeApp = (): React.ReactElement => {
   return (
     <Container>
+      <Image
+        width={600}
+        height={300}
+        src="/bob-is-safe.png" />
       <TransactionForm />
     </Container>
   )
