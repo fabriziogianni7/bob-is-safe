@@ -1,6 +1,6 @@
 import Safe, { EthersAdapter } from '@safe-global/protocol-kit'
 import { useSafeAppsSDK } from '@safe-global/safe-apps-react-sdk'
-import { Button, Form, Input, Select, Card, Alert, Space, Spin, Result } from 'antd'
+import { Button, Form, Input, Select, Card, Alert, Space, Spin, Result ,Typography } from 'antd'
 import { ethers } from 'ethers'
 import React, { useCallback, useEffect, useState } from 'react'
 import safeAbi from '../contracts-abi/safe-abi.json'
@@ -14,6 +14,7 @@ import { layout, tailLayout } from './styles'
 // emit depositSuccess(avatar, _amount);  (safe address, amount) from Module contract
 
 const { Option } = Select
+const { Text, Link } = Typography
 
 const TransactionForm: React.FC = () => {
   const [form] = Form.useForm()
@@ -196,10 +197,12 @@ const TransactionForm: React.FC = () => {
               {TOKEN_OPTIONS.map((token, index) => (
                 <Option value={index} key={index}>
                   {/* <img src={`/coin-logo/bob-logo.png`} alt={token.symbol} /> */}
-                  <img src={token.icon} alt={token.symbol}
-                  width={20} height={20} />
-                  <Space></Space>
-                  {token.symbol}
+                  <Space direction='horizontal'>
+                    <img src={token.icon} alt={token.symbol}
+                      width={20} height={20} />
+
+                    <Text>{token.symbol}</Text>
+                  </Space>
 
                 </Option>
               ))}
