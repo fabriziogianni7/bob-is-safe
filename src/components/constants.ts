@@ -3,7 +3,7 @@ export type Token = {
   decimals: number
   symbol: string
   icon: string
-  poolPercentage?: number
+  poolFee?: number
   width?: number
   height?: number
 }
@@ -22,7 +22,7 @@ export const TOKEN_OPTIONS: Token[] = [
     decimals: 6,
     symbol: 'USDC',
     icon: '/coin-logo/usdc-logo.png',
-    poolPercentage: 500,
+    poolFee: 500,
   },
   {
     address: '0xA',
@@ -37,7 +37,6 @@ export const TOKEN_OPTIONS: Token[] = [
     icon: '/coin-logo/ape-logo.png',
   },
 ]
-
 
 export const BOB_IS_SAFE_MODULE_ADDRESS = '0x8e39a0235fb6475c8ae7d62686e41168a55e1b29'
 
