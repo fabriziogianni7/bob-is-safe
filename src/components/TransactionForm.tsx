@@ -5,8 +5,8 @@ import { ethers } from 'ethers'
 import React, { useCallback, useEffect, useState } from 'react'
 import safeAbi from '../contracts-abi/safe-abi.json'
 import factoryAbi from '../contracts-abi/factory-abi.json'
-import { moduleAbi } from '../module-abi'
-import { BOB_TOKEN_CONTRACT_ADDRESS, BOB_IS_SAFE_MODULE_ADDRESS, TOKEN_OPTIONS } from './constants'
+import moduleAbi from '../contracts-abi/module-abi.json'
+import { BOB_TOKEN_CONTRACT_ADDRESS, BOB_IS_SAFE_MODULE_ADDRESS, TOKEN_OPTIONS, MODULE_FACTORY_CONTRACT_ADDRESS } from './constants'
 import { layout, tailLayout } from './styles'
 //TODO listen for events:
 // enabled: listen on safe contract enabledModule(addr module) (abi safe) DONE!
@@ -23,7 +23,7 @@ const TransactionForm: React.FC = () => {
   const [zkBobAddress, setZkBobAddress] = useState<string>('')
   const [tokenIndex, setTokenIndex] = useState<number>(0)
   const [amount, setAmount] = useState<string>('')
-  const [isModuleEnabled, setIsModuleEnabled] = useState<boolean|null>()
+  const [isModuleEnabled, setIsModuleEnabled] = useState<boolean | null>()
   const [moduleContract, setModuleContract] = useState<any>()
 
   useEffect(() => {
@@ -31,19 +31,35 @@ const TransactionForm: React.FC = () => {
       _setIsModuleEnabled()
     }
 
-    const provider = new ethers.providers.Web3Provider(window.ethereum);
-    const moduleContract = new ethers.Contract(BOB_IS_SAFE_MODULE_ADDRESS, safeAbi, provider)
-    setModuleContract(moduleContract)
+    // const provider = new ethers.providers.Web3Provider(window.ethereum);
+    // const moduleContract = new ethers.Contract(BOB_IS_SAFE_MODULE_ADDRESS, safeAbi, provider)
+    // setModuleContract(moduleContract)
   }, [isModuleEnabled])
 
   useEffect(() => {
     const provider = new ethers.providers.Web3Provider(window.ethereum);
     const safeContract = new ethers.Contract(safe.safeAddress, safeAbi, provider)
-    const fl = safeContract.filters.EnabledModule()
-    safeContract.on(fl, () => {
+    // const factoryContract = new ethers.Contract(MODULE_FACTORY_CONTRACT_ADDRESS, factoryAbi, provider)
+
+    const safeContractFilters = safeContract.filters.EnabledModule()
+    safeContract.on(safeContractFilters, () => {
       setIsModuleEnabled(true)
       setStatus("initial")
     })
+    if (isModuleEnabled) {
+      const moduleContract = new ethers.Contract(BOB_IS_SAFE_MODULE_ADDRESS, moduleAbi, provider)
+      const moduleContractFilters = moduleContract.filters.DepositSuccess()
+      safeContract.on(moduleContractFilters, () => {
+        console.log("deposit successful")
+        setStatus("txSuccess")
+      })
+
+    }
+    // const factoryContractFilters = factoryContract.filters.ModuleProxyCreation()
+    // factoryContract.on(factoryContractFilters, () => {
+    //   setIsModuleEnabled(true)
+    //   setStatus("initial")
+    // })
   }, [])
 
   const enableZKModuleTx = useCallback(async () => {
@@ -209,18 +225,18 @@ const TransactionForm: React.FC = () => {
             </Button>
           </Form.Item>
         </Form>
-      ) : isModuleEnabled != null ?(
+      ) : isModuleEnabled != null ? (
         <Button color="secondary" onClick={enableZKModuleTx}>
           Click to enable ZK module
         </Button>
-      ):
-      <Spin size="default">
-        <Alert
-          message="Loading"
-          description="Loading the Safe App"
-          type="info"
-        />
-      </Spin>
+      ) :
+        <Spin size="default">
+          <Alert
+            message="Loading"
+            description="Loading the Safe App"
+            type="info"
+          />
+        </Spin>
       }
       {/* </Card> */}
     </Card>
