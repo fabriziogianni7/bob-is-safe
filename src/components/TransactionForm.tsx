@@ -7,6 +7,7 @@ import safeAbi from '../contracts-abi/safe-abi.json'
 import moduleAbi from '../contracts-abi/module-abi.json'
 import { BOB_TOKEN_CONTRACT_ADDRESS, BOB_IS_SAFE_MODULE_ADDRESS, TOKEN_OPTIONS } from './constants'
 import { layout, tailLayout } from './styles'
+import { removeZkbobNetworkPrefix } from './helpers'
 
 const { Option } = Select
 const { Text, Link } = Typography
@@ -55,10 +56,10 @@ const TransactionForm: React.FC = () => {
         txs: [
           // TODO: call the factory to deploy the module and then enable the module by passing a predicted address
           /*{
-            to: bobIsSafeFactoryAddress,
-            value: '0',
-            data: new ethers.utils.Interface(factoryAbi).encodeFunctionData("deployModule", [bobIsSafeModuleAddress]),
-          },*/
+                      to: bobIsSafeFactoryAddress,
+                      value: '0',
+                      data: new ethers.utils.Interface(factoryAbi).encodeFunctionData("deployModule", [bobIsSafeModuleAddress]),
+                    },*/
           {
             to: safe.safeAddress,
             value: '0',
@@ -75,25 +76,25 @@ const TransactionForm: React.FC = () => {
 
   const submitTx = async () => {
     try {
-
+      console.log(removeZkbobNetworkPrefix(zkBobAddress))
       const token = TOKEN_OPTIONS[tokenIndex]
       const { safeTxHash } = await sdk.txs.send({
         txs: [
           /*{
-            to: BOB_CONTRACT_ADDRESS,
-            value: '0',
-            data: new ethers.utils.Interface(bobTokenAbi).encodeFunctionData('approve', [
-              '0xE4C77B7787cC116A5E1549c5BB36DE07732100Bb',
-              ethers.utils.parseUnits('100', 18),
-            ]),
-          },*/
+                      to: BOB_CONTRACT_ADDRESS,
+                      value: '0',
+                      data: new ethers.utils.Interface(bobTokenAbi).encodeFunctionData('approve', [
+                        '0xE4C77B7787cC116A5E1549c5BB36DE07732100Bb',
+                        ethers.utils.parseUnits('100', 18),
+                      ]),
+                    },*/
           {
             to: BOB_IS_SAFE_MODULE_ADDRESS,
             value: '0',
-            data: new ethers.utils.Interface(moduleAbi).encodeFunctionData('paymentInPrivateMode2', [
+            data: new ethers.utils.Interface(moduleAbi).encodeFunctionData('paymentInPrivateMode', [
               safe.safeAddress,
               ethers.utils.parseUnits(amount, token.decimals),
-              zkBobAddress,
+              removeZkbobNetworkPrefix(zkBobAddress),
               token.address === BOB_TOKEN_CONTRACT_ADDRESS ? [] : [token.address, BOB_TOKEN_CONTRACT_ADDRESS],
               token.address === BOB_TOKEN_CONTRACT_ADDRESS ? 0 : token.poolFee,
               0,
@@ -101,8 +102,8 @@ const TransactionForm: React.FC = () => {
           },
         ],
         /*params: {
-          safeTxGas: 1000000,
-        },*/
+                  safeTxGas: 1000000,
+                },*/
       })
       console.log({ safeTxHash })
       const safeTx = await sdk.txs.getBySafeTxHash(safeTxHash)
@@ -131,7 +132,18 @@ const TransactionForm: React.FC = () => {
   }, [safe, sdk])
 
   return status === 'txPending' ? (
-    <Card title="Wait for the tx to be confirmed" style={{ width: 700 }} extra={<a href="https://google.com">More</a>}>
+    <Card
+      title="Wait for the tx to be confirmed"
+      style={{ width: 700 }}
+      extra={
+        <a
+          target="_blank"
+          href="https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExMjJmNzYzOGQ4ZTQ5NzQ5ZWQxZjc5MDMyMmEzYWQzMTBmNzM1N2NlZiZlcD12MV9pbnRlcm5hbF9naWZzX2dpZklkJmN0PWc/tpdG5dt17HaO4/giphy-downsized-large.gif"
+        >
+          ⁉️
+        </a>
+      }
+    >
       <Spin size="default">
         <Alert
           message="Transaction is pending"
@@ -142,8 +154,12 @@ const TransactionForm: React.FC = () => {
     </Card>
   ) : status === 'initial' ? (
     <Card
-      title="Send a Direct Deposit using Safe and ZkBob"
-      extra={<a href="https://google.com">More</a>}
+      title="Send payment through zkBob"
+      extra={
+        <a target="_blank" href="https://media.giphy.com/media/tpdG5dt17HaO4/giphy-downsized-large.gif">
+          More
+        </a>
+      }
       style={{ width: 700 }}
     >
       {isModuleEnabled && status === 'initial' ? (
@@ -160,11 +176,11 @@ const TransactionForm: React.FC = () => {
           labelAlign="right"
         >
           <Form.Item name="ZkBob Address" label="zKBob Address" rules={[{ required: true }]}>
-            <Input onChange={(e: any) => setZkBobAddress(e.target.value)} />
+            <Input onChange={(e: any) => setZkBobAddress(e.target.value)} placeholder="zkbob_goerli:randomString" />
           </Form.Item>
-          <Form.Item name="Token Address" label="Token Address" rules={[{ required: true }]}>
+          <Form.Item name="Token" label="Token" rules={[{ required: true }]}>
             <Select
-              placeholder="Select a option and change input text above"
+              placeholder="Select one token"
               onChange={(tokenIndex: number) => {
                 setTokenIndex(tokenIndex)
               }}
@@ -183,17 +199,21 @@ const TransactionForm: React.FC = () => {
             </Select>
           </Form.Item>
           <Form.Item name="Amount" label="Amount" rules={[{ required: true }]}>
-            <Input onChange={(e: any) => setAmount(e.target.value)} />
+            <Input type="number" onChange={(e: any) => setAmount(e.target.value)} placeholder="0.7" />
           </Form.Item>
           <Form.Item {...tailLayout}>
-            <Button type="primary" htmlType="submit" onClick={submitTx}>
-              Send Direct Deposit
+            <Button
+              style={{ background: `linear-gradient(to right, #7D5FFF, #FED471)`, color: 'white', fontWeight: 'bold' }}
+              htmlType="submit"
+              onClick={submitTx}
+            >
+              Send money to your anon fren 🚀
             </Button>
           </Form.Item>
         </Form>
       ) : isModuleEnabled != null ? (
         <Button color="secondary" onClick={enableZKModuleTx}>
-          Click to enable ZK module
+          Add privacy-preserving payments module
         </Button>
       ) : (
         <Spin size="default">
@@ -205,11 +225,10 @@ const TransactionForm: React.FC = () => {
   ) : (
     <Result
       status="success"
-      title="Successfully Deposited Bob"
+      title="Congrats, Bob is Safe!!!! 👷"
       subTitle="Check transaction in Safe Wallet"
       extra={[
-        <Link href={`https://app.safe.global/transactions/history?safe=gor:${safe.safeAddress}`}
-         target="_blank">
+        <Link href={`https://app.safe.global/transactions/history?safe=gor:${safe.safeAddress}`} target="_blank">
           <Button type="primary" key="console">
             Check your Safe
           </Button>
