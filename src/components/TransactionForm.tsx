@@ -7,7 +7,7 @@ import safeAbi from '../contracts-abi/safe-abi.json'
 import moduleAbi from '../contracts-abi/module-abi.json'
 import factoryAbi from '../contracts-abi/factory-abi.json'
 import masterCopyAbi from '../contracts-abi/master-copy-abi.json'
-import { BOB_TOKEN_CONTRACT_ADDRESS, TOKEN_OPTIONS, MODULE_FACTORY_CONTRACT_ADDRESS, MASTER_COPY_CONTRACT } from './constants'
+import { BOB_TOKEN_CONTRACT_ADDRESS, TOKEN_OPTIONS, MODULE_FACTORY_CONTRACT_ADDRESS, MASTER_COPY_CONTRACT, BOB_DEPOSIT_PROTOCOL, UNISWAP_ROUTER } from './constants'
 import { layout, tailLayout } from './styles'
 import { removeZkbobNetworkPrefix } from './helpers'
 import { keccak256 } from 'ethers/lib/utils'
@@ -76,20 +76,10 @@ const TransactionForm: React.FC = () => {
         enableZKModule(address)
       })
 
-      const addr = ethers.utils.getAddress(safe.safeAddress);
-      const encoded = ethers.utils.defaultAbiCoder.encode(["address", "address", "address"], [addr, addr, addr]);
-      console.log(encoded)
-      const masterCopyInterface = new ethers.utils.Interface(masterCopyAbi);
-      const encodedMasterCopy = masterCopyInterface.encodeFunctionData("setUp", [encoded]);
-
-      const deployModule = await factoryContract.deployModule(MASTER_COPY_CONTRACT, encodedMasterCopy, Date.now())
+      const deployModule = await factoryContract.createModule(safe.safeAddress,safe.safeAddress,safe.safeAddress,BOB_TOKEN_CONTRACT_ADDRESS,BOB_DEPOSIT_PROTOCOL,UNISWAP_ROUTER)
       console.log("DEPLOYED MODULE", deployModule)
     }, []
   )
-
-
-
-
 
   const enableZKModule = useCallback(async (moduleAddress: string) => {
     try {
@@ -114,12 +104,13 @@ const TransactionForm: React.FC = () => {
       const module = localStorage.getItem("moduleAddress")
       if (module) {
         const token = TOKEN_OPTIONS[tokenIndex]
+        debugger
         const { safeTxHash } = await sdk.txs.send({
           txs: [
             {
               to: module,
               value: '0',
-              data: new ethers.utils.Interface(moduleAbi).encodeFunctionData('paymentInPrivateMode2', [
+              data: new ethers.utils.Interface(moduleAbi).encodeFunctionData('paymentInPrivateMode', [
                 safe.safeAddress,
                 ethers.utils.parseUnits(amount, token.decimals),
                 zkBobAddress,
