@@ -64,8 +64,9 @@ const TransactionForm: React.FC = () => {
   const _deployModule = useCallback(async () => {
     setStatus('txPending')
 
-    const provider = new ethers.providers.Web3Provider(window.ethereum)
-    const signer = await provider.getSigner()
+    const provider = new ethers.providers.Web3Provider(window.ethereum);
+    await provider.send('eth_requestAccounts', []); // <- this promps user to connect metamask
+    const signer = provider.getSigner();
     const factoryContract = new ethers.Contract(MODULE_FACTORY_CONTRACT_ADDRESS, factoryAbi, signer)
 
     const factoryContractFilters = factoryContract.filters.ModuleProxyCreation()
