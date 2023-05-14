@@ -1,49 +1,31 @@
-# My Safe App
+# ZkBob-SAFE Integration
+This project is a submission for the ETHGlobal Lisbon 2023 Hackathon. It is an integration of ZkBob into SAFE, which allows users to send direct deposits to anonymous addresses using SAFE.
 
-## Getting Started
+## Project Overview
+ZkBob is a privacy-preserving protocol that enables users to send funds to anonymous addresses. SAFE is a toolkit to take advantage of AA features. This project integrates ZkBob into SAFE, allowing users to send direct deposits to anonymous addresses using SAFE.
 
-Install dependencies and start a local dev server.
+## How to Use the App (using our deployed SAFE app)
+To use the app, you will need to go to SAFE and integrate the SAFE app in the Goerli testnet. You can do this by going to your SAFE wallet, selecting "apps" then selecting "My Custom Apps." Next, install https://bob-is-safe.on.fleek.co/ and follow the prompts to integrate the app into your wallet.
 
-```
-yarn install
-cp .env.sample .env
-yarn start
-```
+Once the app is installed, you can use it to send direct deposits to anonymous addresses using ZkBob.
 
-Then:
+## How to Run the Project Locally
+To run the project locally, follow these steps:
 
-- If HTTPS is used (by default enabled)
-  - Open your Safe app locally (by default via https://localhost:3000/) and accept the SSL error.
-- Go to the [Safe web interface](https://app.safe.global)
-- Create your test safe
-- Go to Apps -> Manage Apps -> Add Custom App
-- Paste your localhost URL, default is https://localhost:3000/
-- You should see Safe App Starter as a new app
-- Develop your app from there
+Clone the project to your local machine.
+run `yarn && yarn start`
 
-## Features
+## Other Resources
+**network**: Goerli
 
-Safe App Starter combines recommendations described in the following repositories:
+**module factory**: 0x9E1B59bcD7A225beb924aFA4Cad451e28661d864
 
-- [Safe Apps SDK](https://github.com/safe-global/safe-apps-sdk)
-- [safe-react-components](https://github.com/safe-global/safe-react-components)
+**example of module**: 0x9e1b59bcd7a225beb924afa4cad451e28661d864
 
-You can use the `useSafe` React hook to interact with the Safe Apps SDK
+**SAFE app deployed on fleek**: https://bob-is-safe.on.fleek.co/
 
-```
-const safe = useSafe();
-console.log(safe.info);
-```
+**SAFE custom app to install into safe msig**: https://app.safe.global/share/safe-app?appUrl=https%3A%2F%2Fbob-is-safe.on.fleek.co&chain=gor
 
-Safe React Components are also integrated and ready to use. [See all components](https://components.gnosis-safe.io/).
 
-## Dependencies
-
-### Included
-- [`@gnosis.pm/safe-react-components`](https://github.com/safe-global/safe-react-components) (UI components themed for the Safe interface)
-- [`@rmeissner/safe-apps-react-sdk`](https://github.com/rmeissner/safe-sdks-js/tree/836f40652aaf051b50e980f94af644ae6619334f/safe-apps-react-sdk) (React hook for the Safe Apps SDK)
-
-### Recommended
-- [`ethers`](https://github.com/ethers-io/ethers.js) (Library for interacting with Ethereum)
-- [`web3`](https://github.com/ethereum/web3.js/) (Library for interacting with Ethereum)
-- [`@studydefi/money-legos`](https://github.com/studydefi/money-legos) (Library for DeFi interactions)
+## Conclusion
+ZkBob-SAFE Integration is a powerful tool for anyone who values privacy and security when sending funds on the Ethereum blockchain. With this app, users can send direct deposits to anonymous addresses using the secure and user-friendly interface provided by SAFE. We believe that this integration has the potential to revolutionize the way people interact with the Ethereum network, and we are excited to see how it will be used in the future.
