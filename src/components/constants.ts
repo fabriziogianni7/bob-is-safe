@@ -56,6 +56,6 @@ export const TOKEN_OPTIONS: Token[] = [
       '0x07865c6e87b9f70255377e024ace6630c1eaa37f',
       '0x97a4ab97028466FE67F18A6cd67559BAABE391b8',
     ],
-    swapFees: [500, 100, 500],
+    swapFees: [3000, 100, 500],
   },
 ]
