@@ -245,7 +245,7 @@ const TransactionForm: React.FC = () => {
       ) : isModuleEnabled != null ? (
         <Button
           style={{ background: `linear-gradient(to right, #7D5FFF, #FED471)`, color: 'white', fontWeight: 'bold' }}
-          onClick={enableZKModuleTx}
+          onClick={_deployModule}
         >
           Add privacy-preserving payments module
         </Button>
