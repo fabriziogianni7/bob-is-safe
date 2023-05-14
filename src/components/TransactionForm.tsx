@@ -6,19 +6,15 @@ import React, { useCallback, useEffect, useState } from 'react'
 import safeAbi from '../contracts-abi/safe-abi.json'
 import moduleAbi from '../contracts-abi/module-abi.json'
 import factoryAbi from '../contracts-abi/factory-abi.json'
-import masterCopyAbi from '../contracts-abi/master-copy-abi.json'
 import {
   BOB_TOKEN_CONTRACT_ADDRESS,
   TOKEN_OPTIONS,
   MODULE_FACTORY_CONTRACT_ADDRESS,
-  MASTER_COPY_CONTRACT,
   BOB_DEPOSIT_PROTOCOL,
   UNISWAP_ROUTER,
 } from './constants'
 import { layout, tailLayout } from './styles'
 import { removeZkbobNetworkPrefix } from './helpers'
-import { keccak256 } from 'ethers/lib/utils'
-
 const { Option } = Select
 const { Text, Link } = Typography
 
@@ -54,10 +50,8 @@ const TransactionForm: React.FC = () => {
         const provider = new ethers.providers.Web3Provider(window.ethereum)
         const moduleContract = new ethers.Contract(module, moduleAbi, provider)
         if (moduleContract) {
-          console.log('SHOULD ENABLE THE EVENT LISTENER', module)
           const moduleContractFilters = moduleContract.filters.DepositSuccess()
           moduleContract.on(moduleContractFilters, () => {
-            console.log('DEPOSIT SUCCESS')
             setStatus('txSuccess')
           })
         }
@@ -74,9 +68,7 @@ const TransactionForm: React.FC = () => {
 
     const factoryContractFilters = factoryContract.filters.ModuleProxyCreation()
     factoryContract.on(factoryContractFilters, (address, y) => {
-      console.log('ADDRESSSSS', address, y)
       localStorage.setItem('moduleAddress', address)
-
       enableZKModule(address)
     })
 
@@ -117,17 +109,10 @@ const TransactionForm: React.FC = () => {
         console.log(zkBobAddress)
         console.log([
           safe.safeAddress,
-          ethers.utils.parseUnits(amount, 18),
+          ethers.utils.parseUnits(amount, token.decimals),
           removeZkbobNetworkPrefix(zkBobAddress),
-          token.address === BOB_TOKEN_CONTRACT_ADDRESS
-            ? []
-            : [
-                '0xcbe9771ed31e761b744d3cb9ef78a1f32dd99211',
-                '0xb4fbf271143f4fbf7b91a5ded31805e42b2208d6',
-                '0x07865c6e87b9f70255377e024ace6630c1eaa37f',
-                BOB_TOKEN_CONTRACT_ADDRESS,
-              ],
-          token.address === BOB_TOKEN_CONTRACT_ADDRESS ? [] : [500, 100, 500],
+          token.address === BOB_TOKEN_CONTRACT_ADDRESS ? [] : [token.address, ...token.swapAddresses],
+          token.address === BOB_TOKEN_CONTRACT_ADDRESS ? [] : token.swapFees,
           0,
         ])
         const { safeTxHash } = await sdk.txs.send({
@@ -137,17 +122,10 @@ const TransactionForm: React.FC = () => {
               value: '0',
               data: new ethers.utils.Interface(moduleAbi).encodeFunctionData('paymentInPrivateMode', [
                 safe.safeAddress,
-                ethers.utils.parseUnits(amount, 18),
+                ethers.utils.parseUnits(amount, token.decimals),
                 removeZkbobNetworkPrefix(zkBobAddress),
-                token.address === BOB_TOKEN_CONTRACT_ADDRESS
-                  ? []
-                  : [
-                      '0xcbe9771ed31e761b744d3cb9ef78a1f32dd99211',
-                      '0xb4fbf271143f4fbf7b91a5ded31805e42b2208d6',
-                      '0x07865c6e87b9f70255377e024ace6630c1eaa37f',
-                      BOB_TOKEN_CONTRACT_ADDRESS,
-                    ],
-                token.address === BOB_TOKEN_CONTRACT_ADDRESS ? [] : [500, 100, 500],
+                token.address === BOB_TOKEN_CONTRACT_ADDRESS ? [] : [token.address, ...token.swapAddresses],
+                token.address === BOB_TOKEN_CONTRACT_ADDRESS ? [] : token.swapFees,
                 0,
               ]),
             },
@@ -241,7 +219,6 @@ const TransactionForm: React.FC = () => {
             >
               {TOKEN_OPTIONS.map((token, index) => (
                 <Option value={index} key={index}>
-                  {/* <img src={`/coin-logo/bob-logo.png`} alt={token.symbol} /> */}
                   <Space direction="horizontal">
                     <img src={token.icon} alt={token.symbol} width={20} height={20} />
 
@@ -276,7 +253,6 @@ const TransactionForm: React.FC = () => {
           <Alert message="Loading" description="Loading the Safe App" type="info" />
         </Spin>
       )}
-      {/* </Card> */}
     </Card>
   ) : (
     <Result
