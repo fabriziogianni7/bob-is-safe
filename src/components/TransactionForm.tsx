@@ -13,8 +13,10 @@ import {
   BOB_DEPOSIT_PROTOCOL,
   UNISWAP_ROUTER,
 } from './constants'
+import masterCopyAbi from '../contracts-abi/master-copy-abi.json'
 import { layout, tailLayout } from './styles'
 import { removeZkbobNetworkPrefix } from './helpers'
+
 const { Option } = Select
 const { Text, Link } = Typography
 
@@ -106,15 +108,6 @@ const TransactionForm: React.FC = () => {
       const module = localStorage.getItem('moduleAddress')
       if (module) {
         const token = TOKEN_OPTIONS[tokenIndex]
-        console.log(zkBobAddress)
-        console.log([
-          safe.safeAddress,
-          ethers.utils.parseUnits(amount, token.decimals),
-          removeZkbobNetworkPrefix(zkBobAddress),
-          token.address === BOB_TOKEN_CONTRACT_ADDRESS ? [] : [token.address, ...token.swapAddresses],
-          token.address === BOB_TOKEN_CONTRACT_ADDRESS ? [] : token.swapFees,
-          0,
-        ])
         const { safeTxHash } = await sdk.txs.send({
           txs: [
             {
@@ -259,12 +252,12 @@ const TransactionForm: React.FC = () => {
       status="success"
       title="Congrats, Bob is Safe!!!! 👷"
       subTitle="Check transaction in Safe Wallet"
-      children={<Image width={300} height={249} src="/bob-meme.png" />}
+      children={<Image width={300} height={249} src="/bob-meme.png" preview={false} />}
       extra={[
         <>
           <Link href={`https://app.safe.global/transactions/history?safe=gor:${safe.safeAddress}`} target="_blank">
             <Button type="primary" key="console">
-              Check your Safe
+              Check your Safe transactions
             </Button>
           </Link>
         </>,
