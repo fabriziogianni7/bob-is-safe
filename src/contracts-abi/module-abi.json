@@ -15,6 +15,21 @@
 				"internalType": "address",
 				"name": "_target",
 				"type": "address"
+			},
+			{
+				"internalType": "address",
+				"name": "_bobToken",
+				"type": "address"
+			},
+			{
+				"internalType": "address",
+				"name": "_bobDepositProtocol",
+				"type": "address"
+			},
+			{
+				"internalType": "address",
+				"name": "_uniRouter",
+				"type": "address"
 			}
 		],
 		"stateMutability": "nonpayable",
@@ -235,13 +250,13 @@
 			},
 			{
 				"internalType": "address[]",
-				"name": "path",
+				"name": "tokens",
 				"type": "address[]"
 			},
 			{
-				"internalType": "uint24",
-				"name": "fee",
-				"type": "uint24"
+				"internalType": "uint24[]",
+				"name": "fees",
+				"type": "uint24[]"
 			},
 			{
 				"internalType": "uint256",
@@ -323,13 +338,13 @@
 		"inputs": [
 			{
 				"internalType": "address[]",
-				"name": "path",
+				"name": "tokens",
 				"type": "address[]"
 			},
 			{
-				"internalType": "uint24",
-				"name": "fee",
-				"type": "uint24"
+				"internalType": "uint24[]",
+				"name": "fees",
+				"type": "uint24[]"
 			},
 			{
 				"internalType": "uint256",
@@ -342,11 +357,11 @@
 				"type": "uint256"
 			}
 		],
-		"name": "simpleSwapExactInputSingle",
+		"name": "swapExactInputMultihop",
 		"outputs": [
 			{
 				"internalType": "uint256",
-				"name": "",
+				"name": "amountOut",
 				"type": "uint256"
 			}
 		],

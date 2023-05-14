@@ -7,7 +7,14 @@ import safeAbi from '../contracts-abi/safe-abi.json'
 import moduleAbi from '../contracts-abi/module-abi.json'
 import factoryAbi from '../contracts-abi/factory-abi.json'
 import masterCopyAbi from '../contracts-abi/master-copy-abi.json'
-import { BOB_TOKEN_CONTRACT_ADDRESS, TOKEN_OPTIONS, MODULE_FACTORY_CONTRACT_ADDRESS, MASTER_COPY_CONTRACT, BOB_DEPOSIT_PROTOCOL, UNISWAP_ROUTER } from './constants'
+import {
+  BOB_TOKEN_CONTRACT_ADDRESS,
+  TOKEN_OPTIONS,
+  MODULE_FACTORY_CONTRACT_ADDRESS,
+  MASTER_COPY_CONTRACT,
+  BOB_DEPOSIT_PROTOCOL,
+  UNISWAP_ROUTER,
+} from './constants'
 import { layout, tailLayout } from './styles'
 import { removeZkbobNetworkPrefix } from './helpers'
 import { keccak256 } from 'ethers/lib/utils'
@@ -42,15 +49,15 @@ const TransactionForm: React.FC = () => {
     })
 
     if (isModuleEnabled) {
-      const module = localStorage.getItem("moduleAddress")
+      const module = localStorage.getItem('moduleAddress')
       if (module) {
         const provider = new ethers.providers.Web3Provider(window.ethereum)
         const moduleContract = new ethers.Contract(module, moduleAbi, provider)
         if (moduleContract) {
-          console.log("SHOULD ENABLE THE EVENT LISTENER", module)
+          console.log('SHOULD ENABLE THE EVENT LISTENER', module)
           const moduleContractFilters = moduleContract.filters.DepositSuccess()
           moduleContract.on(moduleContractFilters, () => {
-            console.log("DEPOSIT SUCCESS")
+            console.log('DEPOSIT SUCCESS')
             setStatus('txSuccess')
           })
         }
@@ -58,28 +65,31 @@ const TransactionForm: React.FC = () => {
     }
   }, [isModuleEnabled])
 
+  const _deployModule = useCallback(async () => {
+    setStatus('txPending')
 
+    const provider = new ethers.providers.Web3Provider(window.ethereum)
+    const signer = await provider.getSigner()
+    const factoryContract = new ethers.Contract(MODULE_FACTORY_CONTRACT_ADDRESS, factoryAbi, signer)
 
-  const _deployModule = useCallback(
-    async () => {
-      setStatus('txPending')
+    const factoryContractFilters = factoryContract.filters.ModuleProxyCreation()
+    factoryContract.on(factoryContractFilters, (address, y) => {
+      console.log('ADDRESSSSS', address, y)
+      localStorage.setItem('moduleAddress', address)
 
-      const provider = new ethers.providers.Web3Provider(window.ethereum)
-      const signer = await provider.getSigner()
-      const factoryContract = new ethers.Contract(MODULE_FACTORY_CONTRACT_ADDRESS, factoryAbi, signer)
+      enableZKModule(address)
+    })
 
-      const factoryContractFilters = factoryContract.filters.ModuleProxyCreation()
-      factoryContract.on(factoryContractFilters, (address,y) => {
-        console.log("ADDRESSSSS", address,y)
-        localStorage.setItem('moduleAddress', address);
-
-        enableZKModule(address)
-      })
-
-      const deployModule = await factoryContract.createModule(safe.safeAddress,safe.safeAddress,safe.safeAddress,BOB_TOKEN_CONTRACT_ADDRESS,BOB_DEPOSIT_PROTOCOL,UNISWAP_ROUTER)
-      console.log("DEPLOYED MODULE", deployModule)
-    }, []
-  )
+    const deployModule = await factoryContract.createModule(
+      safe.safeAddress,
+      safe.safeAddress,
+      safe.safeAddress,
+      BOB_TOKEN_CONTRACT_ADDRESS,
+      BOB_DEPOSIT_PROTOCOL,
+      UNISWAP_ROUTER,
+    )
+    console.log('DEPLOYED MODULE', deployModule)
+  }, [])
 
   const enableZKModule = useCallback(async (moduleAddress: string) => {
     try {
@@ -101,10 +111,25 @@ const TransactionForm: React.FC = () => {
 
   const submitTx = async () => {
     try {
-      const module = localStorage.getItem("moduleAddress")
+      const module = localStorage.getItem('moduleAddress')
       if (module) {
         const token = TOKEN_OPTIONS[tokenIndex]
-        debugger
+        console.log(zkBobAddress)
+        console.log([
+          safe.safeAddress,
+          ethers.utils.parseUnits(amount, 18),
+          removeZkbobNetworkPrefix(zkBobAddress),
+          token.address === BOB_TOKEN_CONTRACT_ADDRESS
+            ? []
+            : [
+                '0xcbe9771ed31e761b744d3cb9ef78a1f32dd99211',
+                '0xb4fbf271143f4fbf7b91a5ded31805e42b2208d6',
+                '0x07865c6e87b9f70255377e024ace6630c1eaa37f',
+                BOB_TOKEN_CONTRACT_ADDRESS,
+              ],
+          token.address === BOB_TOKEN_CONTRACT_ADDRESS ? [] : [500, 100, 500],
+          0,
+        ])
         const { safeTxHash } = await sdk.txs.send({
           txs: [
             {
@@ -112,10 +137,17 @@ const TransactionForm: React.FC = () => {
               value: '0',
               data: new ethers.utils.Interface(moduleAbi).encodeFunctionData('paymentInPrivateMode', [
                 safe.safeAddress,
-                ethers.utils.parseUnits(amount, token.decimals),
-                zkBobAddress,
-                token.address === BOB_TOKEN_CONTRACT_ADDRESS ? [] : [token.address, BOB_TOKEN_CONTRACT_ADDRESS],
-                token.address === BOB_TOKEN_CONTRACT_ADDRESS ? 0 : token.poolFee,
+                ethers.utils.parseUnits(amount, 18),
+                removeZkbobNetworkPrefix(zkBobAddress),
+                token.address === BOB_TOKEN_CONTRACT_ADDRESS
+                  ? []
+                  : [
+                      '0xcbe9771ed31e761b744d3cb9ef78a1f32dd99211',
+                      '0xb4fbf271143f4fbf7b91a5ded31805e42b2208d6',
+                      '0x07865c6e87b9f70255377e024ace6630c1eaa37f',
+                      BOB_TOKEN_CONTRACT_ADDRESS,
+                    ],
+                token.address === BOB_TOKEN_CONTRACT_ADDRESS ? [] : [500, 100, 500],
                 0,
               ]),
             },
@@ -135,7 +167,6 @@ const TransactionForm: React.FC = () => {
 
   const _setIsModuleEnabled = useCallback(async () => {
     try {
-
       const ethAdapter = new EthersAdapter({
         ethers,
         signerOrProvider: new ethers.providers.Web3Provider(window.ethereum),
@@ -144,13 +175,13 @@ const TransactionForm: React.FC = () => {
         ethAdapter,
         safeAddress: safe.safeAddress,
       })
-      const module = localStorage.getItem('moduleAddress');
+      const module = localStorage.getItem('moduleAddress')
       if (module) {
         const isEnabled = await safeSDK.isModuleEnabled(module)
         setIsModuleEnabled(isEnabled)
-      } else { setIsModuleEnabled(false) }
-
-
+      } else {
+        setIsModuleEnabled(false)
+      }
     } catch (e) {
       console.error(e)
     }
