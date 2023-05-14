@@ -7,10 +7,13 @@ import safeAbi from '../contracts-abi/safe-abi.json'
 import moduleAbi from '../contracts-abi/module-abi.json'
 import factoryAbi from '../contracts-abi/factory-abi.json'
 import masterCopyAbi from '../contracts-abi/master-copy-abi.json'
-import { BOB_TOKEN_CONTRACT_ADDRESS, TOKEN_OPTIONS, MODULE_FACTORY_CONTRACT_ADDRESS, MASTER_COPY_CONTRACT } from './constants'
+import {
+  BOB_TOKEN_CONTRACT_ADDRESS,
+  TOKEN_OPTIONS,
+  MODULE_FACTORY_CONTRACT_ADDRESS,
+  MASTER_COPY_CONTRACT,
+} from './constants'
 import { layout, tailLayout } from './styles'
-import { removeZkbobNetworkPrefix } from './helpers'
-import { keccak256 } from 'ethers/lib/utils'
 
 const { Option } = Select
 const { Text, Link } = Typography
@@ -42,15 +45,15 @@ const TransactionForm: React.FC = () => {
     })
 
     if (isModuleEnabled) {
-      const module = localStorage.getItem("moduleAddress")
+      const module = localStorage.getItem('moduleAddress')
       if (module) {
         const provider = new ethers.providers.Web3Provider(window.ethereum)
         const moduleContract = new ethers.Contract(module, moduleAbi, provider)
         if (moduleContract) {
-          console.log("SHOULD ENABLE THE EVENT LISTENER", module)
+          console.log('SHOULD ENABLE THE EVENT LISTENER', module)
           const moduleContractFilters = moduleContract.filters.DepositSuccess()
           moduleContract.on(moduleContractFilters, () => {
-            console.log("DEPOSIT SUCCESS")
+            console.log('DEPOSIT SUCCESS')
             setStatus('txSuccess')
           })
         }
@@ -58,38 +61,30 @@ const TransactionForm: React.FC = () => {
     }
   }, [isModuleEnabled])
 
+  const _deployModule = useCallback(async () => {
+    setStatus('txPending')
 
+    const provider = new ethers.providers.Web3Provider(window.ethereum)
+    const signer = await provider.getSigner()
+    const factoryContract = new ethers.Contract(MODULE_FACTORY_CONTRACT_ADDRESS, factoryAbi, signer)
 
-  const _deployModule = useCallback(
-    async () => {
-      setStatus('txPending')
+    const factoryContractFilters = factoryContract.filters.ModuleProxyCreation()
+    factoryContract.on(factoryContractFilters, (address, y) => {
+      console.log('ADDRESSSSS', address, y)
+      localStorage.setItem('moduleAddress', address)
 
-      const provider = new ethers.providers.Web3Provider(window.ethereum)
-      const signer = await provider.getSigner()
-      const factoryContract = new ethers.Contract(MODULE_FACTORY_CONTRACT_ADDRESS, factoryAbi, signer)
+      enableZKModule(address)
+    })
 
-      const factoryContractFilters = factoryContract.filters.ModuleProxyCreation()
-      factoryContract.on(factoryContractFilters, (address,y) => {
-        console.log("ADDRESSSSS", address,y)
-        localStorage.setItem('moduleAddress', address);
+    const addr = ethers.utils.getAddress(safe.safeAddress)
+    const encoded = ethers.utils.defaultAbiCoder.encode(['address', 'address', 'address'], [addr, addr, addr])
+    console.log(encoded)
+    const masterCopyInterface = new ethers.utils.Interface(masterCopyAbi)
+    const encodedMasterCopy = masterCopyInterface.encodeFunctionData('setUp', [encoded])
 
-        enableZKModule(address)
-      })
-
-      const addr = ethers.utils.getAddress(safe.safeAddress);
-      const encoded = ethers.utils.defaultAbiCoder.encode(["address", "address", "address"], [addr, addr, addr]);
-      console.log(encoded)
-      const masterCopyInterface = new ethers.utils.Interface(masterCopyAbi);
-      const encodedMasterCopy = masterCopyInterface.encodeFunctionData("setUp", [encoded]);
-
-      const deployModule = await factoryContract.deployModule(MASTER_COPY_CONTRACT, encodedMasterCopy, Date.now())
-      console.log("DEPLOYED MODULE", deployModule)
-    }, []
-  )
-
-
-
-
+    const deployModule = await factoryContract.deployModule(MASTER_COPY_CONTRACT, encodedMasterCopy, Date.now())
+    console.log('DEPLOYED MODULE', deployModule)
+  }, [])
 
   const enableZKModule = useCallback(async (moduleAddress: string) => {
     try {
@@ -111,7 +106,7 @@ const TransactionForm: React.FC = () => {
 
   const submitTx = async () => {
     try {
-      const module = localStorage.getItem("moduleAddress")
+      const module = localStorage.getItem('moduleAddress')
       if (module) {
         const token = TOKEN_OPTIONS[tokenIndex]
         const { safeTxHash } = await sdk.txs.send({
@@ -144,7 +139,6 @@ const TransactionForm: React.FC = () => {
 
   const _setIsModuleEnabled = useCallback(async () => {
     try {
-
       const ethAdapter = new EthersAdapter({
         ethers,
         signerOrProvider: new ethers.providers.Web3Provider(window.ethereum),
@@ -153,13 +147,13 @@ const TransactionForm: React.FC = () => {
         ethAdapter,
         safeAddress: safe.safeAddress,
       })
-      const module = localStorage.getItem('moduleAddress');
+      const module = localStorage.getItem('moduleAddress')
       if (module) {
         const isEnabled = await safeSDK.isModuleEnabled(module)
         setIsModuleEnabled(isEnabled)
-      } else { setIsModuleEnabled(false) }
-
-
+      } else {
+        setIsModuleEnabled(false)
+      }
     } catch (e) {
       console.error(e)
     }
@@ -245,7 +239,7 @@ const TransactionForm: React.FC = () => {
       ) : isModuleEnabled != null ? (
         <Button
           style={{ background: `linear-gradient(to right, #7D5FFF, #FED471)`, color: 'white', fontWeight: 'bold' }}
-          onClick={enableZKModuleTx}
+          onClick={_deployModule}
         >
           Add privacy-preserving payments module
         </Button>
@@ -261,12 +255,12 @@ const TransactionForm: React.FC = () => {
       status="success"
       title="Congrats, Bob is Safe!!!! 👷"
       subTitle="Check transaction in Safe Wallet"
-      children={<Image width={300} height={249} src="/bob-meme.png" />}
+      children={<Image width={300} height={249} src="/bob-meme.png" preview={false} />}
       extra={[
         <>
           <Link href={`https://app.safe.global/transactions/history?safe=gor:${safe.safeAddress}`} target="_blank">
             <Button type="primary" key="console">
-              Check your Safe
+              Check your Safe transactions
             </Button>
           </Link>
         </>,
