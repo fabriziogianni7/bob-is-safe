@@ -9,10 +9,16 @@ export type Token = {
   height?: number
 }
 
+export const ZKBOB_ADDRESS_PREFIX_REGEX = /^zkbob_[A-Za-z\d]+:/
+export const BOB_TOKEN_CONTRACT_ADDRESS = '0x97a4ab97028466FE67F18A6cd67559BAABE391b8'
+export const MODULE_FACTORY_CONTRACT_ADDRESS = '0x9E1B59bcD7A225beb924aFA4Cad451e28661d864'
+export const BOB_DEPOSIT_PROTOCOL = '0xE4C77B7787cC116A5E1549c5BB36DE07732100Bb'
+export const UNISWAP_ROUTER = '0xE592427A0AEce92De3Edee1F18E0157C05861564'
+
 export const TOKEN_OPTIONS: Token[] = [
   {
     // BOB
-    address: '0x97a4ab97028466FE67F18A6cd67559BAABE391b8',
+    address: BOB_TOKEN_CONTRACT_ADDRESS,
     decimals: 18,
     symbol: 'BOB',
     icon: '/coin-logo/bob-logo.png',
@@ -53,9 +59,3 @@ export const TOKEN_OPTIONS: Token[] = [
     swapFees: [500, 100, 500],
   },
 ]
-
-export const ZKBOB_ADDRESS_PREFIX_REGEX = /^zkbob_[A-Za-z\d]+:/
-export const BOB_TOKEN_CONTRACT_ADDRESS = '0x9E1B59bcD7A225beb924aFA4Cad451e28661d864'
-export const MODULE_FACTORY_CONTRACT_ADDRESS = '0x1bae54b856082b8698d7c2c91425fbcf960b3335'
-export const BOB_DEPOSIT_PROTOCOL = '0xE4C77B7787cC116A5E1549c5BB36DE07732100Bb'
-export const UNISWAP_ROUTER = '0xE592427A0AEce92De3Edee1F18E0157C05861564'
