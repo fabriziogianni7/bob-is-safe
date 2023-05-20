@@ -19,6 +19,7 @@ import {CheckCircleTwoTone} from '@ant-design/icons';
 import TransactionPending from "./TransactionPending";
 import TransactionHistory from './TransactionHistory'
 import LoadingSpinner from "./LoadingSpinner";
+import {Spacer} from "@nextui-org/react";
 
 const {Text, Link} = Typography
 
@@ -26,7 +27,7 @@ const TransactionForm: React.FC = () => {
     const [form] = Form.useForm()
     const {sdk, safe} = useSafeAppsSDK()
 
-    const [status, setStatus] = useState<any>('history')
+    const [status, setStatus] = useState<any>('initial')
     const [zkBobAddress, setZkBobAddress] = useState<string>('')
     const [tokenIndex, setTokenIndex] = useState<number>(0)
     const [amount, setAmount] = useState<string>('')
@@ -181,7 +182,12 @@ const TransactionForm: React.FC = () => {
                 </Button>
             }
         case 'history':
-            return <TransactionHistory/>
+            return <div>
+                <Button onClick={() => setStatus('initial')} size={'small'}>Back</Button>
+                <br/>
+                <br/>
+                <TransactionHistory/>
+            </div>
         case 'txSuccess':
             return <div style={{display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100vh'}}>
                 <div style={{textAlign: 'center', maxWidth: '400px'}}>
