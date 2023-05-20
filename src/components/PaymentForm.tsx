@@ -2,6 +2,7 @@ import React from 'react';
 import { Card, Form, Input, Select, Button } from 'antd';
 import { Option } from 'antd/lib/mentions';
 import { Space, Typography } from 'antd';
+import CircleCrop from "./CircleCrop";
 
 const { Text } = Typography;
 
@@ -69,7 +70,7 @@ export const PaymentForm: React.FC<PaymentFormProps> = ({
                     {TOKEN_OPTIONS.map((token, index) => (
                         <Option value={index.toString()} key={index.toString()}>
                             <Space direction="horizontal">
-                                <img src={token.icon} alt={token.symbol} width={20} height={20} />
+                                <CircleCrop imageUrl={token.icon} altText={token.symbol} size={20} />
                                 <Text>{token.symbol}</Text>
                             </Space>
                         </Option>

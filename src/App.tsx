@@ -12,13 +12,13 @@ const Container = styled.div`
   justify-content: center;
   align-items: center;
   flex-direction: column;
-  background-color: #ffffff;
+  background-color: #fffaee;
 `
 
 const SafeApp = (): React.ReactElement => {
   return (
     <Container>
-      <Image width={600} height={260} src="/bob-is-safe.png" preview={false}/>
+      <Image width={600} height={300} src="/bob-is-safe.png" preview={false}/>
       <TransactionForm />
     </Container>
   )
