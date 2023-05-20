@@ -1,278 +1,225 @@
-import Safe, { EthersAdapter } from '@safe-global/protocol-kit'
-import { useSafeAppsSDK } from '@safe-global/safe-apps-react-sdk'
-import { Button, Form, Input, Select, Card, Alert, Space, Spin, Result, Typography, Image } from 'antd'
-import { ethers } from 'ethers'
-import React, { useCallback, useEffect, useState } from 'react'
+import Safe, {EthersAdapter} from '@safe-global/protocol-kit'
+import {useSafeAppsSDK} from '@safe-global/safe-apps-react-sdk'
+import {Button, Form, Input, Select, Card, Alert, Space, Spin, Result, Typography, Image, Dropdown, Menu} from 'antd'
+import {ethers} from 'ethers'
+import React, {useCallback, useEffect, useState} from 'react'
 import safeAbi from '../contracts-abi/safe-abi.json'
 import moduleAbi from '../contracts-abi/module-abi.json'
 import factoryAbi from '../contracts-abi/factory-abi.json'
 import {
-  BOB_TOKEN_CONTRACT_ADDRESS,
-  TOKEN_OPTIONS,
-  MODULE_FACTORY_CONTRACT_ADDRESS,
-  BOB_DEPOSIT_PROTOCOL,
-  UNISWAP_ROUTER,
+    BOB_TOKEN_CONTRACT_ADDRESS,
+    TOKEN_OPTIONS,
+    MODULE_FACTORY_CONTRACT_ADDRESS,
+    BOB_DEPOSIT_PROTOCOL,
+    UNISWAP_ROUTER,
 } from './constants'
 import masterCopyAbi from '../contracts-abi/master-copy-abi.json'
-import { layout, tailLayout } from './styles'
-import { removeZkbobNetworkPrefix } from './helpers'
-
-const { Option } = Select
-const { Text, Link } = Typography
+import {layout, tailLayout} from './styles'
+import {removeZkbobNetworkPrefix} from './helpers'
+import {PaymentForm} from "./PaymentForm";
+import { CheckCircleTwoTone } from '@ant-design/icons';
+import TransactionPending from "./TransactionPending";
+import DropdownIt from "./DropdownIt";
+const {Option} = Select
+const {Text, Link} = Typography
 
 const TransactionForm: React.FC = () => {
-  const [form] = Form.useForm()
-  const { sdk, safe } = useSafeAppsSDK()
+    const [form] = Form.useForm()
+    const {sdk, safe} = useSafeAppsSDK()
 
-  const [status, setStatus] = useState<'initial' | 'txPending' | 'txSuccess'>('initial')
-  const [zkBobAddress, setZkBobAddress] = useState<string>('')
-  const [tokenIndex, setTokenIndex] = useState<number>(0)
-  const [amount, setAmount] = useState<string>('')
-  const [isModuleEnabled, setIsModuleEnabled] = useState<boolean | null>()
+    const [status, setStatus] = useState<'initial' | 'txPending' | 'txSuccess'>('initial')
+    const [zkBobAddress, setZkBobAddress] = useState<string>('')
+    const [tokenIndex, setTokenIndex] = useState<number>(0)
+    const [amount, setAmount] = useState<string>('')
+    const [isModuleEnabled, setIsModuleEnabled] = useState<boolean | null>(false)
 
-  useEffect(() => {
-    if (!isModuleEnabled) {
-      _setIsModuleEnabled()
-    }
-  }, [isModuleEnabled])
-
-  useEffect(() => {
-    const provider = new ethers.providers.Web3Provider(window.ethereum)
-    const safeContract = new ethers.Contract(safe.safeAddress, safeAbi, provider)
-
-    const safeContractFilters = safeContract.filters.EnabledModule()
-    safeContract.on(safeContractFilters, () => {
-      setIsModuleEnabled(true)
-      setStatus('initial')
-    })
-
-    if (isModuleEnabled) {
-      const module = localStorage.getItem('moduleAddress')
-      if (module) {
-        const provider = new ethers.providers.Web3Provider(window.ethereum)
-        const moduleContract = new ethers.Contract(module, moduleAbi, provider)
-        if (moduleContract) {
-          const moduleContractFilters = moduleContract.filters.DepositSuccess()
-          moduleContract.on(moduleContractFilters, () => {
-            setStatus('txSuccess')
-          })
+    useEffect(() => {
+        if (!isModuleEnabled) {
+            _setIsModuleEnabled()
         }
-      }
-    }
-  }, [isModuleEnabled])
+    }, [isModuleEnabled])
 
-  const _deployModule = useCallback(async () => {
-    setStatus('txPending')
+    useEffect(() => {
+        const provider = new ethers.providers.Web3Provider(window.ethereum)
+        const safeContract = new ethers.Contract(safe.safeAddress, safeAbi, provider)
 
-    const provider = new ethers.providers.Web3Provider(window.ethereum);
-    await provider.send('eth_requestAccounts', []); // <- this promps user to connect metamask
-    const signer = provider.getSigner();
-    const factoryContract = new ethers.Contract(MODULE_FACTORY_CONTRACT_ADDRESS, factoryAbi, signer)
-
-    const factoryContractFilters = factoryContract.filters.ModuleProxyCreation()
-    factoryContract.on(factoryContractFilters, (address, y) => {
-      localStorage.setItem('moduleAddress', address)
-      enableZKModule(address)
-    })
-
-    const deployModule = await factoryContract.createModule(
-      safe.safeAddress,
-      safe.safeAddress,
-      safe.safeAddress,
-      BOB_TOKEN_CONTRACT_ADDRESS,
-      BOB_DEPOSIT_PROTOCOL,
-      UNISWAP_ROUTER,
-    )
-    console.log('DEPLOYED MODULE', deployModule)
-  }, [])
-
-  const enableZKModule = useCallback(async (moduleAddress: string) => {
-    try {
-      const { safeTxHash } = await sdk.txs.send({
-        txs: [
-          {
-            to: safe.safeAddress,
-            value: '0',
-            data: new ethers.utils.Interface(safeAbi).encodeFunctionData('enableModule', [moduleAddress]),
-          },
-        ],
-      })
-      console.log({ safeTxHash })
-    } catch (e) {
-      console.error(e)
-      setStatus('initial')
-    }
-  }, [])
-
-  const submitTx = async () => {
-    try {
-      const module = localStorage.getItem('moduleAddress')
-      if (module) {
-        const token = TOKEN_OPTIONS[tokenIndex]
-        const { safeTxHash } = await sdk.txs.send({
-          txs: [
-            {
-              to: module,
-              value: '0',
-              data: new ethers.utils.Interface(moduleAbi).encodeFunctionData('paymentInPrivateMode', [
-                safe.safeAddress,
-                ethers.utils.parseUnits(amount, token.decimals),
-                removeZkbobNetworkPrefix(zkBobAddress),
-                token.address === BOB_TOKEN_CONTRACT_ADDRESS ? [] : [token.address, ...token.swapAddresses],
-                token.address === BOB_TOKEN_CONTRACT_ADDRESS ? [] : token.swapFees,
-                0,
-              ]),
-            },
-          ],
-          /*params: {
-            safeTxGas: 1000000,
-          },*/
-        })
-        // console.log({ safeTxHash })
-        // const safeTx = await sdk.txs.getBySafeTxHash(safeTxHash)
-        setStatus('txPending')
-      }
-    } catch (e) {
-      console.error(e)
-    }
-  }
-
-  const _setIsModuleEnabled = useCallback(async () => {
-    try {
-      const ethAdapter = new EthersAdapter({
-        ethers,
-        signerOrProvider: new ethers.providers.Web3Provider(window.ethereum),
-      })
-      const safeSDK = await Safe.create({
-        ethAdapter,
-        safeAddress: safe.safeAddress,
-      })
-      const module = localStorage.getItem('moduleAddress')
-      if (module) {
-        const isEnabled = await safeSDK.isModuleEnabled(module)
-        setIsModuleEnabled(isEnabled)
-      } else {
-        setIsModuleEnabled(false)
-      }
-    } catch (e) {
-      console.error(e)
-    }
-  }, [safe, sdk])
-
-  return status === 'txPending' ? (
-    <Card
-      title="Wait for the tx to be confirmed"
-      style={{ width: 700 }}
-      extra={
-        <a target="_blank" href="https://media.giphy.com/media/tpdG5dt17HaO4/giphy-downsized-large.gif">
-          ⁉️
-        </a>
-      }
-    >
-      <Spin size="default">
-        <Alert
-          message="Transaction is pending"
-          description="Please wait until the transaction is confirmed."
-          type="info"
-        />
-      </Spin>
-    </Card>
-  ) : status === 'initial' ? (
-    <Card
-      title="Payments powered by zkBob"
-      extra={
-        <a target="_blank" href="https://zkbob.com">
-          More
-        </a>
-      }
-      style={{ width: 700 }}
-    >
-      {isModuleEnabled && status === 'initial' ? (
-        <Form
-          {...layout}
-          form={form}
-          name="control-hooks"
-          labelCol={{ span: 8 }}
-          wrapperCol={{ span: 16 }}
-          style={{
-            maxWidth: 600,
-            border: 10,
-          }}
-          labelAlign="right"
-        >
-          <Form.Item name="ZkBob Address" label="zKBob Address" rules={[{ required: true }]}>
-            <Input onChange={(e: any) => setZkBobAddress(e.target.value)} placeholder="zkbob_goerli:randomString" />
-          </Form.Item>
-          <Form.Item name="Token" label="Token" rules={[{ required: true }]}>
-            <Select
-              placeholder="Select one token"
-              onChange={(tokenIndex: number) => {
-                setTokenIndex(tokenIndex)
-              }}
-              allowClear
-            >
-              {TOKEN_OPTIONS.map((token, index) => (
-                <Option value={index} key={index}>
-                  <Space direction="horizontal">
-                    <img src={token.icon} alt={token.symbol} width={20} height={20} />
-
-                    <Text>{token.symbol}</Text>
-                  </Space>
-                </Option>
-              ))}
-            </Select>
-          </Form.Item>
-          <Form.Item name="Amount" label="Amount" rules={[{ required: true }]}>
-            <Input type="number" onChange={(e: any) => setAmount(e.target.value)} placeholder="0.7" />
-          </Form.Item>
-          <Form.Item {...tailLayout}>
-            <Button
-              style={{ background: `linear-gradient(to right, #7D5FFF, #FED471)`, color: 'white', fontWeight: 'bold' }}
-              htmlType="submit"
-              onClick={submitTx}
-            >
-              Send money to your anon fren 👷
-            </Button>
-          </Form.Item>
-        </Form>
-      ) : isModuleEnabled != null ? (
-        <Button
-          style={{ background: `linear-gradient(to right, #7D5FFF, #FED471)`, color: 'white', fontWeight: 'bold' }}
-          onClick={_deployModule}
-        >
-          Add privacy-preserving payments module
-        </Button>
-      ) : (
-        <Spin size="default">
-          <Alert message="Loading" description="Loading the Safe App" type="info" />
-        </Spin>
-      )}
-    </Card>
-  ) : (
-    <Result
-      status="success"
-      title="Congrats, Bob is Safe!!!! 👷"
-      subTitle="Check transaction in Safe Wallet"
-      children={<Image width={300} height={249} src="/bob-meme.png" preview={false} />}
-      extra={[
-        <>
-          <Link href={`https://app.safe.global/transactions/history?safe=gor:${safe.safeAddress}`} target="_blank">
-            <Button type="primary" key="console">
-              Check your Safe transactions
-            </Button>
-          </Link>
-        </>,
-        <Button
-          key="restart"
-          onClick={() => {
+        const safeContractFilters = safeContract.filters.EnabledModule()
+        safeContract.on(safeContractFilters, () => {
+            setIsModuleEnabled(true)
             setStatus('initial')
-          }}
+        })
+
+        if (isModuleEnabled) {
+            const module = localStorage.getItem('moduleAddress')
+            if (module) {
+                const provider = new ethers.providers.Web3Provider(window.ethereum)
+                const moduleContract = new ethers.Contract(module, moduleAbi, provider)
+                if (moduleContract) {
+                    const moduleContractFilters = moduleContract.filters.DepositSuccess()
+                    moduleContract.on(moduleContractFilters, () => {
+                        setStatus('txSuccess')
+                    })
+                }
+            }
+        }
+    }, [isModuleEnabled])
+
+    const _deployModule = useCallback(async () => {
+        setStatus('txPending')
+
+        const provider = new ethers.providers.Web3Provider(window.ethereum);
+        await provider.send('eth_requestAccounts', []); // <- this promps user to connect metamask
+        const signer = provider.getSigner();
+        const factoryContract = new ethers.Contract(MODULE_FACTORY_CONTRACT_ADDRESS, factoryAbi, signer)
+
+        const factoryContractFilters = factoryContract.filters.ModuleProxyCreation()
+        factoryContract.on(factoryContractFilters, (address, y) => {
+            localStorage.setItem('moduleAddress', address)
+            enableZKModule(address)
+        })
+
+        const deployModule = await factoryContract.createModule(
+            safe.safeAddress,
+            safe.safeAddress,
+            safe.safeAddress,
+            BOB_TOKEN_CONTRACT_ADDRESS,
+            BOB_DEPOSIT_PROTOCOL,
+            UNISWAP_ROUTER,
+        )
+        console.log('DEPLOYED MODULE', deployModule)
+    }, [])
+
+    const enableZKModule = useCallback(async (moduleAddress: string) => {
+        try {
+            const {safeTxHash} = await sdk.txs.send({
+                txs: [
+                    {
+                        to: safe.safeAddress,
+                        value: '0',
+                        data: new ethers.utils.Interface(safeAbi).encodeFunctionData('enableModule', [moduleAddress]),
+                    },
+                ],
+            })
+            console.log({safeTxHash})
+        } catch (e) {
+            console.error(e)
+            setStatus('initial')
+        }
+    }, [])
+
+    const submitTx = async () => {
+        try {
+            const module = localStorage.getItem('moduleAddress')
+            if (module) {
+                const token = TOKEN_OPTIONS[tokenIndex]
+                const {safeTxHash} = await sdk.txs.send({
+                    txs: [
+                        {
+                            to: module,
+                            value: '0',
+                            data: new ethers.utils.Interface(moduleAbi).encodeFunctionData('paymentInPrivateMode', [
+                                safe.safeAddress,
+                                ethers.utils.parseUnits(amount, token.decimals),
+                                removeZkbobNetworkPrefix(zkBobAddress),
+                                token.address === BOB_TOKEN_CONTRACT_ADDRESS ? [] : [token.address, ...token.swapAddresses],
+                                token.address === BOB_TOKEN_CONTRACT_ADDRESS ? [] : token.swapFees,
+                                0,
+                            ]),
+                        },
+                    ],
+                })
+                setStatus('txPending')
+            }
+        } catch (e) {
+            console.error(e)
+        }
+    }
+
+    const _setIsModuleEnabled = useCallback(async () => {
+        try {
+            const ethAdapter = new EthersAdapter({
+                ethers,
+                signerOrProvider: new ethers.providers.Web3Provider(window.ethereum),
+            })
+            const safeSDK = await Safe.create({
+                ethAdapter,
+                safeAddress: safe.safeAddress,
+            })
+            const module = localStorage.getItem('moduleAddress')
+            if (module) {
+                const isEnabled = await safeSDK.isModuleEnabled(module)
+                setIsModuleEnabled(isEnabled)
+            } else {
+                setIsModuleEnabled(false)
+            }
+        } catch (e) {
+            console.error(e)
+        }
+    }, [safe, sdk])
+
+    return status === 'txPending' ? (
+        <TransactionPending />
+    ) : status === 'initial' ? (
+
+        <Card
+            title="Payments powered by zkBob"
+            extra={
+                <a href="https://zkbob.com" target="_blank" rel="noopener noreferrer">
+                    More
+                </a>
+            }
+            style={{
+                width: 900,
+                borderRadius: '8px',
+                boxShadow: '0 2px 6px rgba(0, 0, 0, 0.1)',
+            }}
         >
-          Send another payment
-        </Button>,
-      ]}
-    />
-  )
+            {isModuleEnabled && status === 'initial' ? (
+                <PaymentForm form={form} setZkBobAddress={setZkBobAddress} setTokenIndex={setTokenIndex} setAmount={setAmount}
+                             submitTx={submitTx} TOKEN_OPTIONS={TOKEN_OPTIONS}/>
+            ) : isModuleEnabled != null ? (
+                <Button
+                    style={{
+                        background: 'linear-gradient(to right, #7D5FFF, #A489FF)',
+                        color: 'white',
+                        fontWeight: 'bold',
+                        border: 'none',
+                        borderRadius: '20px',
+                        boxShadow: '0 2px 6px rgba(0, 0, 0, 0.1)',
+                        width: '100%',
+                        height: '40px',
+                    }}
+                    onClick={_deployModule}
+                >
+                    <Space>
+                        <Text style={{ fontSize: '16px', color: "white"}}>Add privacy-preserving payments module</Text>
+                    </Space>
+                </Button>
+            ) : (
+                <Spin size="default" tip="Loading the Safe App" style={{ textAlign: 'center' }}>
+                    <Alert message="Loading" type="info" />
+                </Spin>
+            )}
+        </Card>
+    ) : (
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100vh' }}>
+            <div style={{ textAlign: 'center', maxWidth: '400px' }}>
+                <CheckCircleTwoTone twoToneColor="#52c41a" style={{ fontSize: '72px', marginBottom: '24px' }} />
+                <h1 style={{ fontSize: '24px', fontWeight: 'bold', marginBottom: '16px' }}>Congrats, Bob is Safe!</h1>
+                <div style={{ marginBottom: '40px' }}>
+                    <Link href={`https://app.safe.global/transactions/history?safe=gor:${safe.safeAddress}`} target="_blank">
+                        <Button type="primary" style={{ width: '100%', borderRadius: '20px', marginBottom: '16px' }}>
+                            Check your Safe transactions
+                        </Button>
+                    </Link>
+                    <Button style={{ width: '100%', borderRadius: '20px' }} onClick={() => { setStatus('initial') }}>
+                        Go back to Home
+                    </Button>
+                </div>
+                <Image width={300} height={249} src="/bob-meme.png" preview={false} />
+            </div>
+        </div>
+    )
 }
 
 export default TransactionForm
