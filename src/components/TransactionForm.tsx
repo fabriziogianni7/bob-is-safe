@@ -1,6 +1,6 @@
 import Safe, {EthersAdapter} from '@safe-global/protocol-kit'
 import {useSafeAppsSDK} from '@safe-global/safe-apps-react-sdk'
-import {Button, Form, Input, Select, Card, Alert, Space, Spin, Result, Typography, Image} from 'antd'
+import {Button, Form, Input, Select, Card, Alert, Space, Spin, Result, Typography, Image, Dropdown, Menu} from 'antd'
 import {ethers} from 'ethers'
 import React, {useCallback, useEffect, useState} from 'react'
 import safeAbi from '../contracts-abi/safe-abi.json'
@@ -19,6 +19,7 @@ import {removeZkbobNetworkPrefix} from './helpers'
 import {PaymentForm} from "./PaymentForm";
 import { CheckCircleTwoTone } from '@ant-design/icons';
 import TransactionPending from "./TransactionPending";
+import DropdownIt from "./DropdownIt";
 const {Option} = Select
 const {Text, Link} = Typography
 
@@ -159,10 +160,11 @@ const TransactionForm: React.FC = () => {
     return status === 'txPending' ? (
         <TransactionPending />
     ) : status === 'initial' ? (
+
         <Card
             title="Payments powered by zkBob"
             extra={
-                <a target="_blank" href="https://zkbob.com" rel="noopener noreferrer">
+                <a href="https://zkbob.com" target="_blank" rel="noopener noreferrer">
                     More
                 </a>
             }
