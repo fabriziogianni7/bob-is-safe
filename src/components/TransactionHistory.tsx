@@ -115,7 +115,7 @@ const data: DataType[] = [
     {
         key: '1',
         address: 'zkbob_goerli:93zRekKk69QahZWB4UX261bV9FMJtJbGjoj1ugZtunrCfpupAYkS9hojZuw5miS',
-        amount: 1,
+        amount: 1000,
         token: ["BOB", "/coin-logo/bob-logo.png"],
         tags: ['DEV', 'JUNIOR'],
         action: "Send",
@@ -124,7 +124,7 @@ const data: DataType[] = [
     {
         key: '2',
         address: 'zkbob_goerli:8vYHiH84ijNxDaCDb31hWjp4rzGdndm2oZybDUD4nHNUf31hDo8pREDnpYNdza9',
-        amount: 1,
+        amount: 2000,
         token: ["GHO", "/coin-logo/gho-logo.png"],
         tags: ['PM'],
         action: "Send",
@@ -133,7 +133,7 @@ const data: DataType[] = [
     {
         key: '3',
         address: 'zkbob_goerli:AFs9zLdSHhUsEvx9jekr4JpcgCzzYUGog9utSaqr4m7PRagVJQBTAv3r8dbvjAP',
-        amount: 1,
+        amount: 400,
         token: ["USDC", "/coin-logo/usdc-logo.png"],
         tags: ['VC'],
         action: "Receive",
@@ -142,7 +142,7 @@ const data: DataType[] = [
     {
         key: '4',
         address: 'zkbob_goerli:85VnkbKjL9f7S98KLaTGxLHdADtyNvtK1ZckYKvydCNdBUbkRn2X1LVKkBT5f7Y',
-        amount: 1,
+        amount: 1500,
         token: ["GHO", "/coin-logo/gho-logo.png"],
         tags: ['VC'],
         action: "Receive",
@@ -151,7 +151,7 @@ const data: DataType[] = [
     {
         key: '5',
         address: 'zkbob_goerli:2p9sXneUjbPFRosqY51B3aiLwXAMvS47rZup5nZ27zJRqswhDrUhgcTEXQ5Cik3',
-        amount: 1,
+        amount: 7000,
         token: ["APE", "/coin-logo/ape-logo.png"],
         tags: ['developer'],
         action: "Send",
