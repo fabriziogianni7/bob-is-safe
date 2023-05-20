@@ -37,7 +37,7 @@ const TransactionForm: React.FC = () => {
         if (!isModuleEnabled) {
             _setIsModuleEnabled()
         }
-    }, [isModuleEnabled])
+    }, [isModuleEnabled, safe.safeAddress])
 
     useEffect(() => {
         const provider = new ethers.providers.Web3Provider(window.ethereum)
@@ -62,7 +62,7 @@ const TransactionForm: React.FC = () => {
                 }
             }
         }
-    }, [isModuleEnabled])
+    }, [isModuleEnabled, safe.safeAddress])
 
     const _deployModule = useCallback(async () => {
         setStatus('txPending')
@@ -105,7 +105,7 @@ const TransactionForm: React.FC = () => {
             console.error(e)
             setStatus('initial')
         }
-    }, [])
+    }, [safe.safeAddress, sdk.txs])
 
     const submitTx = async () => {
         try {
@@ -155,16 +155,20 @@ const TransactionForm: React.FC = () => {
         } catch (e) {
             console.error(e)
         }
-    }, [safe, sdk])
+    }, [safe])
 
     switch (status) {
         case 'txPending':
             return <TransactionPending/>
         case 'initial':
             if (isModuleEnabled) {
-                return <PaymentForm form={form} setZkBobAddress={setZkBobAddress} setTokenIndex={setTokenIndex}
+                return <div>
+                    <Button size={'small'} onClick={() => setStatus('history')}>History</Button>
+                    <br/>
+                    <br/>
+                    <PaymentForm form={form} setZkBobAddress={setZkBobAddress} setTokenIndex={setTokenIndex}
                                     setAmount={setAmount}
-                                    submitTx={submitTx} TOKEN_OPTIONS={TOKEN_OPTIONS}/>
+                                 submitTx={submitTx} TOKEN_OPTIONS={TOKEN_OPTIONS}/></div>
             } else {
                 return <Button
                     style={{
