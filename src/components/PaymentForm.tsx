@@ -44,10 +44,10 @@ export const PaymentForm: React.FC<PaymentFormProps> = ({
             labelCol={{ span: 8 }}
             wrapperCol={{ span: 16 }}
             style={{
-                maxWidth: 600,
-                padding: '16px',
-                borderRadius: '4px',
-                marginTop: '16px',
+                maxWidth: 1000,
+                padding: '32px',
+                borderRadius: '8px',
+                marginTop: '32px',
             }}
             labelAlign="right"
         >

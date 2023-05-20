@@ -18,6 +18,7 @@ import {layout, tailLayout} from './styles'
 import {removeZkbobNetworkPrefix} from './helpers'
 import {PaymentForm} from "./PaymentForm";
 import { CheckCircleTwoTone } from '@ant-design/icons';
+import TransactionPending from "./TransactionPending";
 const {Option} = Select
 const {Text, Link} = Typography
 
@@ -25,7 +26,7 @@ const TransactionForm: React.FC = () => {
     const [form] = Form.useForm()
     const {sdk, safe} = useSafeAppsSDK()
 
-    const [status, setStatus] = useState<'initial' | 'txPending' | 'txSuccess'>('txSuccess')
+    const [status, setStatus] = useState<'initial' | 'txPending' | 'txSuccess'>('initial')
     const [zkBobAddress, setZkBobAddress] = useState<string>('')
     const [tokenIndex, setTokenIndex] = useState<number>(0)
     const [amount, setAmount] = useState<string>('')
@@ -125,12 +126,7 @@ const TransactionForm: React.FC = () => {
                             ]),
                         },
                     ],
-                    /*params: {
-                      safeTxGas: 1000000,
-                    },*/
                 })
-                // console.log({ safeTxHash })
-                // const safeTx = await sdk.txs.getBySafeTxHash(safeTxHash)
                 setStatus('txPending')
             }
         } catch (e) {
@@ -161,30 +157,7 @@ const TransactionForm: React.FC = () => {
     }, [safe, sdk])
 
     return status === 'txPending' ? (
-        <Card
-            title="Wait for the tx to be confirmed"
-            style={{
-                width: 700,
-                borderRadius: '8px',
-                boxShadow: '0 2px 6px rgba(0, 0, 0, 0.1)',
-            }}
-            extra={
-                <a target="_blank" href="https://media.giphy.com/media/tpdG5dt17HaO4/giphy-downsized-large.gif">
-                    ⁉️
-                </a>
-            }
-        >
-            <Alert
-                message={
-                    <div>
-                        <Spin size="small" style={{ marginRight: '8px' }} />
-                        Transaction is pending
-                    </div>
-                }
-                description="Please wait until the transaction is confirmed."
-                type="info"
-            />
-        </Card>
+        <TransactionPending />
     ) : status === 'initial' ? (
         <Card
             title="Payments powered by zkBob"
@@ -194,7 +167,7 @@ const TransactionForm: React.FC = () => {
                 </a>
             }
             style={{
-                width: 700,
+                width: 900,
                 borderRadius: '8px',
                 boxShadow: '0 2px 6px rgba(0, 0, 0, 0.1)',
             }}
