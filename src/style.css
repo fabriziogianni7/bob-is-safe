@@ -10,3 +10,28 @@
     background-color: #ffeddb !important;
 }
 
+input {
+    padding: 8px 12px !important;
+    font-size: 16px !important;
+}
+
+.ant-select-selector {
+    height: 44px !important;
+    padding: 8px 12px !important;
+    font-size: 16px !important;
+}
+
+.gradient-button:hover {
+    background: linear-gradient(to right, #ffd480, #f9b43e) !important;
+}
+
+.testo-bellissimo {
+    text-align: center;
+    max-width: 360px;
+    color: rgba(0, 0, 0, 0.64);
+    margin: 0 0 8px 0 !important;
+}
+
+.back-hover:hover {
+    color: rgba(0, 0, 0, 0.8) !important;
+}

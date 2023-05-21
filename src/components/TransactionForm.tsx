@@ -159,73 +159,127 @@ const TransactionForm: React.FC = () => {
 
     switch (status) {
         case 'txPending':
-            return <TransactionPending/>
+            return <TransactionPending isModuleEnabled={isModuleEnabled}/>
         case 'initial':
             if (isModuleEnabled) {
                 return <div>
-                    <Button size={'small'} onClick={() => setStatus('history')}>History</Button>
+                    {/* <Button style={{
+                        background: 'transparent',
+                        color: '#7D5FFF',
+                        border: '1px solid #7D5FFF',
+                        borderRadius: '20px',
+                        height: '40px',
+                    }} size={'small'} onClick={() => setStatus('history')}>History</Button> */}
                     <br/>
                     <br/>
                     <PaymentForm form={form} setZkBobAddress={setZkBobAddress} setTokenIndex={setTokenIndex}
-                                    setAmount={setAmount}
+                                 setAmount={setAmount}
                                  submitTx={submitTx} TOKEN_OPTIONS={TOKEN_OPTIONS}/></div>
             } else {
-                return <Button
-                    style={{
-                        background: 'linear-gradient(to right, #7D5FFF, #A489FF)',
-                        color: 'white',
-                        fontWeight: 'bold',
-                        border: 'none',
-                        borderRadius: '20px',
-                        boxShadow: '0 2px 6px rgba(0, 0, 0, 0.1)',
-                        height: '40px',
-                    }}
-                    onClick={_deployModule}
-                >
-                    <Text style={{fontSize: '16px', color: "white"}}>Enable privacy-preserving payments module</Text>
-                </Button>
+                return <div style={{
+                    justifyContent: 'center',
+                    backgroundColor: "white",
+                    borderRadius: "15px",
+                    border: "1px solid rgba(0, 0, 0, 0.06)",
+                    padding: "32px",
+                }}>
+                    <p className="testo-bellissimo">
+                        You need to enable the module in order to use it. This is a one time action.
+                    </p>
+                    <Button
+                        className="gradient-button"
+                        style={{
+                            background: 'linear-gradient(to right, #ffbb33, #f7a10c)',
+                            color: 'white',
+                            fontWeight: 'bold',
+                            border: 'none',
+                            fontSize: '16px',
+                            textTransform: 'uppercase',
+                            borderRadius: '8px',
+                            boxShadow: '0 2px 6px rgba(0, 0, 0, 0.1)',
+                            width: '360px',
+                            height: "48px",
+                            marginTop: '12px',
+                            marginBottom: "0px !important",
+                        }}
+                        onClick={_deployModule}
+                    >
+                        <Text style={{fontSize: '16px', color: "white"}}>Enable module</Text>
+                    </Button>
+                </div>
             }
         case 'history':
             return <div>
-                <Button onClick={() => setStatus('initial')} size={'small'}>Back</Button>
+                <Button style={{
+                    background: 'transparent',
+                    color: '#7D5FFF',
+                    border: '1px solid #7D5FFF',
+                    borderRadius: '20px',
+                    height: '30px',
+                    width: '100px',
+                }} onClick={() => setStatus('initial')} size={'small'}>Back</Button>
                 <br/>
                 <br/>
                 <TransactionHistory/>
             </div>
         case 'txSuccess':
-            return <div style={{display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100vh'}}>
+            return <div style={{
+                display: 'flex',
+                padding: 32,
+                alignItems: 'center',
+                justifyContent: 'center',
+                backgroundColor: "white",
+                borderRadius: "15px",
+                border: "1px solid rgba(0, 0, 0, 0.06)",
+            }}>
                 <div style={{textAlign: 'center', maxWidth: '400px'}}>
-                    <CheckCircleTwoTone twoToneColor="#52c41a" style={{fontSize: '72px', marginBottom: '24px'}}/>
-                    <h1 style={{fontSize: '24px', fontWeight: 'bold', marginBottom: '16px'}}>Transaction confirmed!</h1>
-                    <div style={{marginBottom: '40px'}}>
-                        <Link href={`https://app.safe.global/transactions/history?safe=gor:${safe.safeAddress}`}
-                              target="_blank">
-                            <Button type="primary" style={{
-                                background: 'linear-gradient(to right, #7D5FFF, #A489FF)',
-                                color: 'white',
-                                fontWeight: 'bold',
-                                border: 'none',
-                                borderRadius: '20px',
-                                boxShadow: '0 2px 6px rgba(0, 0, 0, 0.1)',
-                                height: '40px',
-                            }}>
-                                Check your Safe transactions
-                            </Button>
-                        </Link>
-                        {' '}
-                        <Button style={{
-                            background: 'transparent',
-                            color: '#7D5FFF',
-                            border: '1px solid #7D5FFF',
-                            borderRadius: '20px',
-                            height: '40px',
+                    <Image height="80px" src="/bob-meme.png" preview={false}/>
+                    <h1 style={{fontSize: '24px', fontWeight: 'bold', marginBottom: '16px', marginTop: "16px"}}>Transaction confirmed!</h1>
+                    <div style={{marginTop: '36px'}}>
+
+                        <Button className="gradient-button" style={{
+                            background: 'linear-gradient(to right, #ffbb33, #f7a10c)',
+                            color: 'white',
+                            fontWeight: 'bold',
+                            border: 'none',
+                            fontSize: '16px',
+                            textTransform: 'uppercase',
+                            borderRadius: '8px',
+                            boxShadow: '0 2px 6px rgba(0, 0, 0, 0.1)',
+                            width: '360px',
+                            height: "48px",
+                            marginTop: '12px',
+                            marginBottom: "0px !important",
                         }} onClick={() => {
                             setStatus('initial')
                         }}>
-                            Go back to Home
+                            Make another payment
                         </Button>
+
+                        {' '}
+                        <Link href={`https://app.safe.global/transactions/history?safe=gor:${safe.safeAddress}`}
+                              target="_blank">
+                            <Button className="back-hover" style={{
+                                background: "none",
+                                color: 'rgba(0, 0, 0, 0.4)',
+                                fontWeight: 'medium',
+                                border: 'none',
+                                fontSize: '16px',
+                                boxShadow: 'none',
+                                textTransform: 'uppercase',
+                                borderRadius: '8px',
+                                width: '360px',
+                                height: "48px",
+                                marginTop: '6px',
+                                marginBottom: "0px !important",
+                            }} onClick={() => {
+                                setStatus('initial')
+                            }}>
+                                Check your transactions
+                            </Button>
+                        </Link>
                     </div>
-                    <Image width={300} height={249} src="/bob-meme.png" preview={false}/>
+
                 </div>
             </div>
         default:

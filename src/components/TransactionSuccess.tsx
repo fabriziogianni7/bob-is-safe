@@ -13,7 +13,20 @@ const TransactionSuccess = ({
             <h1 style={{fontSize: '24px', fontWeight: 'bold', marginBottom: '16px'}}>Congrats, Bob is Safe!</h1>
             <div style={{marginBottom: '40px'}}>
                 <Link href={`https://app.safe.global/transactions/history?safe=gor:${safeAddress}`} target="_blank">
-                    <Button type="primary" style={{width: '100%', borderRadius: '20px', marginBottom: '16px'}}>
+                    <Button className="gradient-button" style={{
+                        background: 'linear-gradient(to right, #ffbb33, #f7a10c)',
+                        color: 'white',
+                        fontWeight: 'bold',
+                        border: 'none',
+                        fontSize: '16px',
+                        textTransform: 'uppercase',
+                        borderRadius: '8px',
+                        boxShadow: '0 2px 6px rgba(0, 0, 0, 0.1)',
+                        width: '360px',
+                        height: "48px",
+                        marginTop: '12px',
+                        marginBottom: "0px !important",
+                    }}>
                         Check your Safe transactions
                     </Button>
                 </Link>
