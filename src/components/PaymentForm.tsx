@@ -28,6 +28,7 @@ export const PaymentForm: React.FC<PaymentFormProps> = ({
                                                             submitTx,
                                                             TOKEN_OPTIONS,
                                                         }) => {
+
     const layout = {
         labelCol: {span: 24},
         wrapperCol: {span: 24},
@@ -39,7 +40,11 @@ export const PaymentForm: React.FC<PaymentFormProps> = ({
 
     return (
         <div style={{
-            justifyContent: 'center'}}>
+            justifyContent: 'center',
+            backgroundColor: "white",
+            borderRadius: "15px",
+            border: "1px solid rgba(0, 0, 0, 0.06)",
+        }}>
             <Form
                 {...layout}
                 form={form}
@@ -47,18 +52,26 @@ export const PaymentForm: React.FC<PaymentFormProps> = ({
                 style={{
                     padding: '32px',
                     borderRadius: '8px',
-                    marginTop: '32px',
-                    maxWidth: '600px',
+                    maxWidth: '800px',
                 }}
                 labelAlign="right"
             >
-                <Form.Item name="ZkBobAddress" label="zKBob Address" rules={[{required: true}]} >
+                <Form.Item name="Amount" style={{borderRadius: '8px',}} rules={[{required: true, message: 'Please enter an amount'}]}>
+                    <Input pattern="[0-9.]*" onKeyPress={(e) => {
+                        const pattern = /[\d.]/
+                        const inputChar = String.fromCharCode(e.charCode)
+                        if (!pattern.test(inputChar)) {
+                            e.preventDefault()
+                        }
+                    }} onChange={(e) => setAmount(e.target.value)} placeholder="0"/>
+                </Form.Item>
+                <Form.Item name="ZkBobAddress" style={{borderRadius: '8px',}} rules={[{required: true}]}>
                     <Input
                         onChange={(e) => setZkBobAddress(e.target.value)}
-                        placeholder="zkbob_goerli:randomString"
+                        placeholder="zkBob receiver address"
                     />
                 </Form.Item>
-                <Form.Item name="Token" label="Token" rules={[{required: true}]}>
+                <Form.Item name="Token" rules={[{required: true}]} style={{borderRadius: '8px',}}>
                     <Select
                         placeholder="Select one token"
                         onChange={(tokenIndex: number) => {
@@ -77,27 +90,27 @@ export const PaymentForm: React.FC<PaymentFormProps> = ({
                         ))}
                     </Select>
                 </Form.Item>
-                <Form.Item name="Amount" label="Amount" rules={[{required: true, message: 'Please enter an amount'}]}>
-                    <Input type="number" onChange={(e) => setAmount(e.target.value)} placeholder="0.7"/>
-                </Form.Item>
-                <Form.Item wrapperCol={{...tailLayout.wrapperCol}}>
                     <Button
                         className="gradient-button"
                         htmlType="submit"
                         onClick={submitTx}
                         style={{
-                            background: 'linear-gradient(to right, #7D5FFF, #A489FF)',
+                            background: 'linear-gradient(to right, #ffbb33, #f7a10c)',
                             color: 'white',
                             fontWeight: 'bold',
                             border: 'none',
-                            borderRadius: '20px',
+                            fontSize: '16px',
+                            textTransform: 'uppercase',
+                            borderRadius: '8px',
                             boxShadow: '0 2px 6px rgba(0, 0, 0, 0.1)',
-                            width: '100%',
+                            width: '360px',
+                            height: "48px",
+                            marginTop: '12px',
+                            marginBottom: "0px !important",
                         }}
                     >
-                        Send money to your anon fren 👷
+                        Transfer
                     </Button>
-                </Form.Item>
             </Form>
         </div>
     );
