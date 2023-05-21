@@ -1,0 +1,12 @@
+.ant-table {
+    background: none !important;
+}
+
+.ant-table-cell-row-hover {
+     background-color: #fff3d6 !important;
+}
+
+.ant-table-thead >tr>th {
+    background-color: #ffeddb !important;
+}
+

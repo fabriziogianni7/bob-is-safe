@@ -1,6 +1,8 @@
 import React from 'react';
 import { Space, Table, Tag } from 'antd';
 import type { ColumnsType } from 'antd/es/table';
+import "./../style.css"
+import CircleCrop from "./CircleCrop";
 
 interface DataType {
     key: string;
@@ -33,37 +35,24 @@ const columns: ColumnsType<DataType> = [
                 case 'BOB':
                     return (<Space size="middle">
                         <img src={token[1]} alt={token.symbol} width={20} height={20} />
-                        {/* <p >{token[0]}</p> */}
                     </Space>)
-                    break;
                 case 'USDC':
                     return (<Space size="middle">
                         <img src={token[1]} alt={token.symbol} width={20} height={20} />
-                        {/* <p >{token[0]}</p> */}
                     </Space>)
-                    break;
                 case 'GHO':
                     return (<Space size="middle">
-                        <img src={token[1]} alt={token.symbol} width={20} height={20} />
-                        {/* <p >{token[0]}</p> */}
+                        <CircleCrop imageUrl={token[1]} altText={token.symbol} size={20} />
                     </Space>)
-                    break;
                 case 'APE':
                     return (<Space size="middle">
                         <img src={token[1]} alt={token.symbol} width={20} height={20} />
-                        {/* <p >{token[0]}</p> */}
                     </Space>)
-                    break;
-
                 default:
                     break;
             }
 
         }
-        // <Space size="middle">
-        //     <p >{token}</p>
-        // </Space>
-
     },
     {
         title: 'Tags',
@@ -76,7 +65,7 @@ const columns: ColumnsType<DataType> = [
                     if (tag === 'developer') {
                         color = 'volcano';
                     }
-                    if (tag === 'VC') {
+                    if (tag === 'DONATION') {
                         color = '#7D5FFF';
                     }
                     return (
@@ -115,7 +104,7 @@ const data: DataType[] = [
     {
         key: '1',
         address: 'zkbob_goerli:93zRekKk69QahZWB4UX261bV9FMJtJbGjoj1ugZtunrCfpupAYkS9hojZuw5miS',
-        amount: 1000,
+        amount: 300,
         token: ["BOB", "/coin-logo/bob-logo.png"],
         tags: ['DEV', 'JUNIOR'],
         action: "Send",
@@ -124,7 +113,7 @@ const data: DataType[] = [
     {
         key: '2',
         address: 'zkbob_goerli:8vYHiH84ijNxDaCDb31hWjp4rzGdndm2oZybDUD4nHNUf31hDo8pREDnpYNdza9',
-        amount: 2000,
+        amount: 250,
         token: ["GHO", "/coin-logo/gho-logo.png"],
         tags: ['PM'],
         action: "Send",
@@ -133,25 +122,25 @@ const data: DataType[] = [
     {
         key: '3',
         address: 'zkbob_goerli:AFs9zLdSHhUsEvx9jekr4JpcgCzzYUGog9utSaqr4m7PRagVJQBTAv3r8dbvjAP',
-        amount: 400,
+        amount: 1000,
         token: ["USDC", "/coin-logo/usdc-logo.png"],
-        tags: ['VC'],
+        tags: ['DONATION'],
         action: "Receive",
         transaction: "0x1135ea88eb93b20d45a019f510f2c0652df952fa9e820b72355fe0cca2c5b940"
     },
     {
         key: '4',
         address: 'zkbob_goerli:85VnkbKjL9f7S98KLaTGxLHdADtyNvtK1ZckYKvydCNdBUbkRn2X1LVKkBT5f7Y',
-        amount: 1500,
+        amount: 750,
         token: ["GHO", "/coin-logo/gho-logo.png"],
-        tags: ['VC'],
+        tags: ['DONATION'],
         action: "Receive",
         transaction: "0xa0e84e6cd6d3ceb0c74c83d7a71ebbf89482334cf51acc941f3afb54f44330ef"
     },
     {
         key: '5',
         address: 'zkbob_goerli:2p9sXneUjbPFRosqY51B3aiLwXAMvS47rZup5nZ27zJRqswhDrUhgcTEXQ5Cik3',
-        amount: 7000,
+        amount: 500,
         token: ["APE", "/coin-logo/ape-logo.png"],
         tags: ['developer'],
         action: "Send",
@@ -159,6 +148,13 @@ const data: DataType[] = [
     },
 ];
 
-const TransactionHistory: React.FC = () => <Table columns={columns} dataSource={data} />;
+
+
+const TransactionHistory: React.FC = () => {
+    const rowClassName = (record: any, index: number) => {
+        return index % 2 === 0 ? 'even-row' : 'odd-row';
+    };
+    return <Table columns={columns} className="custom-table" dataSource={data} rowClassName={rowClassName} />;
+}
 
 export default TransactionHistory;

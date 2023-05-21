@@ -1,8 +1,8 @@
-import Safe, { EthersAdapter } from '@safe-global/protocol-kit'
-import { useSafeAppsSDK } from '@safe-global/safe-apps-react-sdk'
-import { Button, Form, Input, Select, Card, Alert, Space, Spin, Result, Typography, Image, Dropdown, Menu } from 'antd'
-import { ethers } from 'ethers'
-import React, { useCallback, useEffect, useState } from 'react'
+import Safe, {EthersAdapter} from '@safe-global/protocol-kit'
+import {useSafeAppsSDK} from '@safe-global/safe-apps-react-sdk'
+import {Button, Form, Input, Select, Card, Alert, Space, Spin, Result, Typography, Image, Dropdown, Menu} from 'antd'
+import {ethers} from 'ethers'
+import React, {useCallback, useEffect, useState} from 'react'
 import safeAbi from '../contracts-abi/safe-abi.json'
 import moduleAbi from '../contracts-abi/module-abi.json'
 import factoryAbi from '../contracts-abi/factory-abi.json'
@@ -13,20 +13,19 @@ import {
     BOB_DEPOSIT_PROTOCOL,
     UNISWAP_ROUTER,
 } from './constants'
-import masterCopyAbi from '../contracts-abi/master-copy-abi.json'
-import { layout, tailLayout } from './styles'
-import { removeZkbobNetworkPrefix } from './helpers'
-import { PaymentForm } from "./PaymentForm";
-import { CheckCircleTwoTone } from '@ant-design/icons';
+import {removeZkbobNetworkPrefix} from './helpers'
+import {PaymentForm} from "./PaymentForm";
+import {CheckCircleTwoTone} from '@ant-design/icons';
 import TransactionPending from "./TransactionPending";
-import DropdownIt from "./DropdownIt";
 import TransactionHistory from './TransactionHistory'
-const { Option } = Select
-const { Text, Link } = Typography
+import LoadingSpinner from "./LoadingSpinner";
+import {Spacer} from "@nextui-org/react";
+
+const {Text, Link} = Typography
 
 const TransactionForm: React.FC = () => {
     const [form] = Form.useForm()
-    const { sdk, safe } = useSafeAppsSDK()
+    const {sdk, safe} = useSafeAppsSDK()
 
     const [status, setStatus] = useState<any>('initial')
     const [zkBobAddress, setZkBobAddress] = useState<string>('')
@@ -38,7 +37,7 @@ const TransactionForm: React.FC = () => {
         if (!isModuleEnabled) {
             _setIsModuleEnabled()
         }
-    }, [isModuleEnabled])
+    }, [isModuleEnabled, safe.safeAddress])
 
     useEffect(() => {
         const provider = new ethers.providers.Web3Provider(window.ethereum)
@@ -63,7 +62,7 @@ const TransactionForm: React.FC = () => {
                 }
             }
         }
-    }, [isModuleEnabled])
+    }, [isModuleEnabled, safe.safeAddress])
 
     const _deployModule = useCallback(async () => {
         setStatus('txPending')
@@ -92,7 +91,7 @@ const TransactionForm: React.FC = () => {
 
     const enableZKModule = useCallback(async (moduleAddress: string) => {
         try {
-            const { safeTxHash } = await sdk.txs.send({
+            const {safeTxHash} = await sdk.txs.send({
                 txs: [
                     {
                         to: safe.safeAddress,
@@ -101,19 +100,19 @@ const TransactionForm: React.FC = () => {
                     },
                 ],
             })
-            console.log({ safeTxHash })
+            console.log({safeTxHash})
         } catch (e) {
             console.error(e)
             setStatus('initial')
         }
-    }, [])
+    }, [safe.safeAddress, sdk.txs])
 
     const submitTx = async () => {
         try {
             const module = localStorage.getItem('moduleAddress')
             if (module) {
                 const token = TOKEN_OPTIONS[tokenIndex]
-                const { safeTxHash } = await sdk.txs.send({
+                const {safeTxHash} = await sdk.txs.send({
                     txs: [
                         {
                             to: module,
@@ -156,106 +155,82 @@ const TransactionForm: React.FC = () => {
         } catch (e) {
             console.error(e)
         }
-    }, [safe, sdk])
+    }, [safe])
 
-    return status === 'txPending' ? (
-        <TransactionPending />
-    ) : status === 'initial' ? (
-
-        <Card
-            title="Payments powered by zkBob"
-            extra={[
-                <Space size="middle">
-                    <a href="https://zkbob.com" target="_blank" rel="noopener noreferrer">
-                        More
-                    </a>
-                    {
-                        status !== 'history' ?
-                            <Button size={'small'} onClick={() => setStatus('history')}>History</Button> :
-                            <Button  onClick={() => setStatus('initial')} size={'small'}>Back</Button>
-
-                    }
-                    {/* <p >{token[0]}</p> */}
-                </Space>
-            ]}
-            style={{
-                width: 900,
-                borderRadius: '8px',
-                boxShadow: '0 2px 6px rgba(0, 0, 0, 0.1)',
-            }}
-        >
-            {isModuleEnabled && status === 'initial' ? (
-                <PaymentForm form={form} setZkBobAddress={setZkBobAddress} setTokenIndex={setTokenIndex} setAmount={setAmount}
-                    submitTx={submitTx} TOKEN_OPTIONS={TOKEN_OPTIONS} />
-            ) :
-                isModuleEnabled != null ? (
-                    <Button
-                        style={{
-                            background: 'linear-gradient(to right, #7D5FFF, #A489FF)',
-                            color: 'white',
-                            fontWeight: 'bold',
-                            border: 'none',
-                            borderRadius: '20px',
-                            boxShadow: '0 2px 6px rgba(0, 0, 0, 0.1)',
-                            width: '100%',
-                            height: '40px',
-                        }}
-                        onClick={_deployModule}
-                    >
-                        <Space>
-                            <Text style={{ fontSize: '16px', color: "white" }}>Add privacy-preserving payments module</Text>
-                        </Space>
-                    </Button>
-                ) : (
-                    <Spin size="default" tip="Loading the Safe App" style={{ textAlign: 'center' }}>
-                        <Alert message="Loading" type="info" />
-                    </Spin>
-                )}
-        </Card>
-    ) : status === 'history' ? <Card
-        title="Payments powered by zkBob"
-         extra={[
-                <Space size="middle">
-                    <a href="https://zkbob.com" target="_blank" rel="noopener noreferrer">
-                        More
-                    </a>
-                    {
-                        status !== 'history' ?
-                            <Button size={'small'} onClick={() => setStatus('history')}>History</Button> :
-                            <Button  onClick={() => setStatus('initial')} size={'small'}>Back</Button>
-
-                    }
-                    {/* <p >{token[0]}</p> */}
-                </Space>
-            ]}
-        style={{
-            width: 900,
-            borderRadius: '8px',
-            boxShadow: '0 2px 6px rgba(0, 0, 0, 0.1)',
-        }}
-    >
-        <TransactionHistory />
-    </Card>
-        :
-        (
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100vh' }}>
-                <div style={{ textAlign: 'center', maxWidth: '400px' }}>
-                    <CheckCircleTwoTone twoToneColor="#52c41a" style={{ fontSize: '72px', marginBottom: '24px' }} />
-                    <h1 style={{ fontSize: '24px', fontWeight: 'bold', marginBottom: '16px' }}>Congrats, Bob is Safe!</h1>
-                    <div style={{ marginBottom: '40px' }}>
-                        <Link href={`https://app.safe.global/transactions/history?safe=gor:${safe.safeAddress}`} target="_blank">
-                            <Button type="primary" style={{ width: '100%', borderRadius: '20px', marginBottom: '16px' }}>
+    switch (status) {
+        case 'txPending':
+            return <TransactionPending/>
+        case 'initial':
+            if (isModuleEnabled) {
+                return <div>
+                    <Button size={'small'} onClick={() => setStatus('history')}>History</Button>
+                    <br/>
+                    <br/>
+                    <PaymentForm form={form} setZkBobAddress={setZkBobAddress} setTokenIndex={setTokenIndex}
+                                    setAmount={setAmount}
+                                 submitTx={submitTx} TOKEN_OPTIONS={TOKEN_OPTIONS}/></div>
+            } else {
+                return <Button
+                    style={{
+                        background: 'linear-gradient(to right, #7D5FFF, #A489FF)',
+                        color: 'white',
+                        fontWeight: 'bold',
+                        border: 'none',
+                        borderRadius: '20px',
+                        boxShadow: '0 2px 6px rgba(0, 0, 0, 0.1)',
+                        height: '40px',
+                    }}
+                    onClick={_deployModule}
+                >
+                    <Text style={{fontSize: '16px', color: "white"}}>Enable privacy-preserving payments module</Text>
+                </Button>
+            }
+        case 'history':
+            return <div>
+                <Button onClick={() => setStatus('initial')} size={'small'}>Back</Button>
+                <br/>
+                <br/>
+                <TransactionHistory/>
+            </div>
+        case 'txSuccess':
+            return <div style={{display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100vh'}}>
+                <div style={{textAlign: 'center', maxWidth: '400px'}}>
+                    <CheckCircleTwoTone twoToneColor="#52c41a" style={{fontSize: '72px', marginBottom: '24px'}}/>
+                    <h1 style={{fontSize: '24px', fontWeight: 'bold', marginBottom: '16px'}}>Transaction confirmed!</h1>
+                    <div style={{marginBottom: '40px'}}>
+                        <Link href={`https://app.safe.global/transactions/history?safe=gor:${safe.safeAddress}`}
+                              target="_blank">
+                            <Button type="primary" style={{
+                                background: 'linear-gradient(to right, #7D5FFF, #A489FF)',
+                                color: 'white',
+                                fontWeight: 'bold',
+                                border: 'none',
+                                borderRadius: '20px',
+                                boxShadow: '0 2px 6px rgba(0, 0, 0, 0.1)',
+                                height: '40px',
+                            }}>
                                 Check your Safe transactions
                             </Button>
                         </Link>
-                        <Button style={{ width: '100%', borderRadius: '20px' }} onClick={() => { setStatus('initial') }}>
+                        {' '}
+                        <Button style={{
+                            background: 'transparent',
+                            color: '#7D5FFF',
+                            border: '1px solid #7D5FFF',
+                            borderRadius: '20px',
+                            height: '40px',
+                        }} onClick={() => {
+                            setStatus('initial')
+                        }}>
                             Go back to Home
                         </Button>
                     </div>
-                    <Image width={300} height={249} src="/bob-meme.png" preview={false} />
+                    <Image width={300} height={249} src="/bob-meme.png" preview={false}/>
                 </div>
             </div>
-        )
+        default:
+            return <div>Something went wrong</div>
+    }
 }
 
 export default TransactionForm
