@@ -6,6 +6,7 @@ import SafeProvider from '@safe-global/safe-apps-react-sdk'
 
 import GlobalStyle from './GlobalStyle'
 import App from './App'
+import { Web3Provider } from './context'
 
 ReactDOM.render(
   <React.StrictMode>
@@ -19,7 +20,9 @@ ReactDOM.render(
           </>
         }
       >
-        <App />
+        <Web3Provider>
+          <App />
+        </Web3Provider>
       </SafeProvider>
     </ThemeProvider>
   </React.StrictMode>,
