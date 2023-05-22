@@ -104,21 +104,6 @@ export const Web3Provider = ({ children }: { children: ReactNode }) => {
     }
 
 
-    // const initLedgerTestContract = async (merchant_ledger:string) => {
-    //     // // try {
-    //     // //     if (!signer) {
-    //     // //         await getSigner()
-    //     // //     }
-
-    //     // //     const ledger = new ethers.Contract(merchant_ledger, LEDGER_TEST_ABI, signer.current)
-
-
-    //     // //     return ledger
-
-    //     // } catch (error) {
-    //     //     console.log(error)
-    //     // }
-    // }
 
 
 
@@ -128,7 +113,6 @@ export const Web3Provider = ({ children }: { children: ReactNode }) => {
         signer: signer.current,
         connectSigner,
         connectToDefaultNetwork,
-        // initLedgerTestContract
     }}>
         {children}
     </Web3Context.Provider>)
