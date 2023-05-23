@@ -1,13 +1,13 @@
 module.exports = function (webpackEnv) {
+  // ...
+  return {
     // ...
-    return {
-        // ...
-        resolve: {
-            // ...
-            fallback: {
-                // 👇️👇️👇️ add this 👇️👇️👇️
-                "assert": require.resolve("assert"),
-            }
-        }
+    resolve: {
+      // ...
+      fallback: {
+        // 👇️👇️👇️ add this 👇️👇️👇️
+        assert: require.resolve('assert')
+      }
     }
+  }
 }

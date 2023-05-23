@@ -1,3 +1,26 @@
+export const POLYGON_MUMBAI = {
+  chainId: '0x13881',
+  rpcUrls: ['https://rpc-mumbai.maticvigil.com'],
+  chainName: 'Mumbai',
+  nativeCurrency: {
+    name: 'MATIC',
+    symbol: 'MATIC',
+    decimals: 18
+  },
+  blockExplorerUrls: ['https://mumbai.polygonscan.com']
+}
+export const GOERLI = {
+  chainId: '0x5',
+  rpcUrls: ['https://goerli.infura.io/v3/'],
+  chainName: 'Mumbai',
+  nativeCurrency: {
+    name: 'ETH',
+    symbol: 'GoerliETH',
+    decimals: 18
+  },
+  blockExplorerUrls: ['https://goerli.etherscan.io']
+}
+
 export interface Token {
   address: string
   decimals: number
@@ -14,7 +37,7 @@ export const BOB_TOKEN_CONTRACT_ADDRESS = '0x97a4ab97028466FE67F18A6cd67559BAABE
 export const MODULE_FACTORY_CONTRACT_ADDRESS = '0x9E1B59bcD7A225beb924aFA4Cad451e28661d864'
 export const BOB_DEPOSIT_PROTOCOL = '0xE4C77B7787cC116A5E1549c5BB36DE07732100Bb'
 export const UNISWAP_ROUTER = '0xE592427A0AEce92De3Edee1F18E0157C05861564'
-const x = 'foo'
+
 export const TOKEN_OPTIONS: Token[] = [
   {
     // BOB
