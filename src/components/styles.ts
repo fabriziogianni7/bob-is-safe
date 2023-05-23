@@ -1,13 +1,12 @@
 
-
 export const layout = {
   labelCol: {
     span: 0,
-    color: 'red',
+    color: 'red'
   },
-  wrapperCol: { span: 14 },
+  wrapperCol: { span: 14 }
 }
 
 export const tailLayout = {
-  wrapperCol: { offset: 8, span: 16 },
+  wrapperCol: { offset: 8, span: 16 }
 }

@@ -1,11 +1,11 @@
-import React from 'react';
-import {Col, Row, Typography} from 'antd';
-import { LinkOutlined, ArrowDownOutlined } from '@ant-design/icons';
+import React from 'react'
+import { Col, Row, Typography } from 'antd'
+import { LinkOutlined, ArrowDownOutlined } from '@ant-design/icons'
 
-const { Text } = Typography;
+const { Text } = Typography
 
-const DropdownItem = ({ amount, receiver, timestamp, txLink }: {amount: number; receiver: string; timestamp: string, txLink: string}) => {
-    return (
+const DropdownItem = ({ amount, receiver, timestamp, txLink }: { amount: number, receiver: string, timestamp: string, txLink: string }) => {
+  return (
         <div className="dropdown-item">
             <Row gutter={16} align="middle">
                 <Col span={4} className="icon"><ArrowDownOutlined/></Col>
@@ -29,7 +29,7 @@ const DropdownItem = ({ amount, receiver, timestamp, txLink }: {amount: number; 
                 </Col>
             </Row>
         </div>
-    );
-};
+  )
+}
 
-export default DropdownItem;
+export default DropdownItem

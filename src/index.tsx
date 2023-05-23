@@ -15,7 +15,7 @@ ReactDOM.render(
       <SafeProvider
         loader={
           <>
-            <Title size="md">Waiting for Safe...</Title>
+             <Title size="md">Waiting for Safe...</Title>
             <Loader size="md" />
           </>
         }
@@ -26,5 +26,5 @@ ReactDOM.render(
       </SafeProvider>
     </ThemeProvider>
   </React.StrictMode>,
-  document.getElementById('root'),
+  document.getElementById('root')
 )

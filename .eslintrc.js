@@ -1,19 +1,31 @@
 module.exports = {
-  parser: "@typescript-eslint/parser",
+  env: {
+    browser: true,
+    es2021: true
+  },
   extends: [
-    "plugin:@typescript-eslint/recommended",
-    "prettier",
-    "react-app",
-    "plugin:jsx-a11y/recommended",
+    'plugin:react/recommended',
+    'standard-with-typescript'
   ],
-  plugins: ["jsx-a11y"],
+  overrides: [
+  ],
   parserOptions: {
-    ecmaVersion: 2018,
-    sourceType: "module",
+    ecmaVersion: 'latest',
+    sourceType: 'module',
+    project: './tsconfig.json'
   },
+  plugins: [
+    'react'
+  ],
   rules: {
-    "@typescript-eslint/camelcase": "off",
-    "@typescript-eslint/no-var-requires": "off",
-    "@typescript-eslint/no-empty-function": "off",
-  },
+    '@typescript-eslint/explicit-function-return-type': 'off',
+    '@typescript-eslint/strict-boolean-expressions': 'off',
+    '@typescript-eslint/no-misused-promises': 'off',
+    'react/react-in-jsx-scope': 'off',
+    '@typescript-eslint/triple-slash-reference': 'off',
+    '@typescript-eslint/consistent-type-assertions': 'off',
+    '@typescript-eslint/restrict-template-expressions': 'off',
+    '@typescript-eslint/no-unused-vars': 'warn',
+    '@typescript-eslint/no-floating-promises': 'off'
+  }
 }
