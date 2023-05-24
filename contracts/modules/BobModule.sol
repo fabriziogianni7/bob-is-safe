@@ -141,6 +141,8 @@ contract BobModule is IBobModule {
         payment.paymentsLeft = payments;
         payment.active = true;
 
+        emit NewPaymentScheduled(amount, executionTimeInterval, payments, _rawZkAddress);
+
         return _keyIndex;    
     }
 
@@ -187,6 +189,9 @@ contract BobModule is IBobModule {
         if(deactivePayment == 1) {
             scheduledPayment.active = false;
         }
+
+        emit ChangedPaymentScheduled(scheduledPayment.recurringAmmount, scheduledPayment.executionInterval, scheduledPayment.paymentsLeft, scheduledPayment.zkAddress);
+
     }
 
     /**
