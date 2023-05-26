@@ -56,6 +56,11 @@ contract BobModule is IBobModule {
         _;
     }
 
+    modifier onlyOwner() {
+        require(msg.sender == owner);
+        _;
+    }
+
     // constructor
 
     /**
@@ -82,17 +87,21 @@ contract BobModule is IBobModule {
         uniRouter02 = _uniRouter02;
         router = ISwapRouter(uniRouter02);
         zkBobProtocol = IZkBobDirectDeposits(bobDepositProtocol);
-
         safe = IGnosisSafe(owner);
     }
 
     /**
-     * @dev Function to change the worker account. Only accessible by the owner.
+     * @dev Function to change the worker account. Only accessible by the owner (aka Safe wallet).
      * @param newWorker The new worker wallet address.
      * @return The new worker address.
      */
-    function setNewWorkerAddress(address newWorker) external returns(address) {
-        require (msg.sender == owner);
+    function setNewWorkerAddress(
+        address newWorker
+        ) 
+        external 
+        onlyOwner 
+        returns(address) 
+    {
         return(workerAccount = newWorker);
     }
 
@@ -115,6 +124,7 @@ contract BobModule is IBobModule {
         uint256 amountOutMin
         )
         external
+        onlyWorkerOrOwner
         returns(uint256)
     {
         return (_singlePrivatePayment(_fallbackUser, _amount, _rawZkAddress, tokens, fees, amountOutMin));
@@ -129,9 +139,21 @@ contract BobModule is IBobModule {
      * @param _rawZkAddress The raw ZK address for privacy-enhanced transactions.
      * @return _keyIndex The unique identifier for the created scheduled payment.
      */
-    function createScheduledPayment(uint256 amount, uint256 executionTimeInterval, address paymentToken, uint256 payments, bytes memory _rawZkAddress) onlyWorkerOrOwner external returns(uint256) {
+    function createScheduledPayment(
+        uint256 amount, 
+        uint256 executionTimeInterval, 
+        address paymentToken, 
+        uint256 payments, 
+        bytes memory _rawZkAddress
+        ) 
+        onlyWorkerOrOwner 
+        external 
+        returns(uint256) 
+    {
+        // Validate input params 
+        _validateScheduledPaymentData(amount, executionTimeInterval, paymentToken, payments, _rawZkAddress);
+        // Increment keyIndex Id
         bytes32 id = _randomKey(_keyIndex++);
-
         // assign each field individually
         ScheduledPayment storage payment = scheduledPayments[id];
         payment.recurringAmmount = amount;
@@ -142,7 +164,6 @@ contract BobModule is IBobModule {
         payment.active = true;
 
         emit NewPaymentScheduled(amount, executionTimeInterval, payments, _rawZkAddress);
-
         return _keyIndex;    
     }
 
@@ -150,19 +171,27 @@ contract BobModule is IBobModule {
      * @dev Executes a scheduled payment identified by the payment index.
      * @param paymentIndex The unique identifier of the scheduled payment to be executed.
      */
-    function executeScheduledPayment(bytes32 paymentIndex) external {
-
+    function executeScheduledPayment(
+        bytes32 paymentIndex
+        ) 
+        external 
+    {
         ScheduledPayment storage scheduledPayment = scheduledPayments[paymentIndex];
 
-        if(scheduledPayment.active == false) revert PaymentDisabled();
+        //require(scheduledPayment.recurringAmmount != 0, "wrong index");
 
+        if(scheduledPayment.active == false) revert PaymentDisabled();
+        if(block.timestamp < scheduledPayment.nextExecution) revert TooEarly();
+
+        // TBD now support only BOB token
         _singlePrivatePayment(owner, scheduledPayment.recurringAmmount, scheduledPayment.zkAddress, new address[](0), new uint24[](0), 0);
                 
         if (scheduledPayment.paymentsLeft-- == 0) {
             scheduledPayment.active = false;
         }
-
-        scheduledPayment.nextExecution = _setNextExecution(scheduledPayment.executionInterval);
+        else {
+            scheduledPayment.nextExecution = _setNextExecution(scheduledPayment.executionInterval);
+        }
     }
 
     /**
@@ -172,21 +201,36 @@ contract BobModule is IBobModule {
      * @param executionTimeInterval The new time interval for payment execution.
      * @param paymentToken The new token to be used for payment.
      * @param _rawZkAddress The new raw ZK address for privacy-enhanced transactions.
-     * @param deactivePayment If set to 1, the scheduled payment will be deactivated.
+     * @param deactiveScheduledPayment If set to 1, the scheduled payment will be deactivated.
      */
-    function changeScheduledPayment(bytes32 index, uint256 amount, uint256 executionTimeInterval, address paymentToken, bytes memory _rawZkAddress, uint256 deactivePayment) onlyWorkerOrOwner external {
-        
+    function changeScheduledPayment(
+        bytes32 index, 
+        uint256 amount, 
+        uint256 executionTimeInterval, 
+        address paymentToken, 
+        bytes memory _rawZkAddress, 
+        uint256 paymentsLeft, 
+        uint256 deactiveScheduledPayment
+        ) 
+        onlyWorkerOrOwner 
+        external 
+    {
         ScheduledPayment storage scheduledPayment = scheduledPayments[index];
 
-        // check id the scheduled payment is valid 
+        // check if the scheduled payment is valid 
         if(scheduledPayment.active == false) revert PaymentDisabled();
+        // validate input params
+        _validateScheduledPaymentData(amount, executionTimeInterval, paymentToken, paymentsLeft, _rawZkAddress);
 
-        scheduledPayment.recurringAmmount = (amount != 0 ? amount : scheduledPayment.recurringAmmount);
-        scheduledPayment.executionInterval = (executionTimeInterval != 0 ? executionTimeInterval : scheduledPayment.executionInterval);
-        scheduledPayment.paymentToken = (paymentToken != address(0) ? paymentToken : scheduledPayment.paymentToken);
-        scheduledPayment.zkAddress = _rawZkAddress.length != 0 ? _rawZkAddress : scheduledPayment.zkAddress;
+        // update scheduledPayment params
+        scheduledPayment.recurringAmmount = amount;
+        scheduledPayment.executionInterval = executionTimeInterval;
+        scheduledPayment.paymentToken = paymentToken;
+        scheduledPayment.zkAddress = _rawZkAddress;
+        scheduledPayment.paymentsLeft = paymentsLeft;
 
-        if(deactivePayment == 1) {
+        // eventually deactive the scheduled payment
+        if(deactiveScheduledPayment == 1) {
             scheduledPayment.active = false;
         }
 
@@ -228,18 +272,16 @@ contract BobModule is IBobModule {
      * @return The output amount.
      */
     function swapExactInputMultihop(
-        //bytes memory path,
         address[] memory tokens,
         uint24[] memory fees,
         uint256 amountOutMin,
         uint256 amountIn
         ) 
-        public 
-        payable 
+        internal  
         returns (uint256) 
     {
-        require(fees.length+1 == tokens.length, "Fees array length should be one less than tokens array length");
-        require(tokens[tokens.length-1] == bobToken);
+        if(fees.length+1 != tokens.length) revert WrongFeesOrTokensArrays();
+        if(tokens[tokens.length-1] != bobToken) revert WrongOutToken();
 
         // Approve the router to spend the token
         IERC20(tokens[0]).approve(uniRouter02, amountIn);
@@ -263,7 +305,7 @@ contract BobModule is IBobModule {
 
         // Executes the swap and returns the output amount
         uint256 amountOut;
-        return (( amountOut) = router.exactInput(params));
+        return ((amountOut) = router.exactInput(params));
     }
 
     // private function to make deposits
@@ -274,8 +316,9 @@ contract BobModule is IBobModule {
         address[] memory tokens,
         uint24[] memory fees,
         uint256 amountOutMin
-        ) private returns(uint256) 
-
+        ) 
+        private 
+        returns(uint256) 
     {
         // Check if a swap is required
         if (tokens.length != 0) {
@@ -284,36 +327,93 @@ contract BobModule is IBobModule {
             require(safe.execTransactionFromModule(tokens[0], 0, data, Enum.Operation.Call), "Could not execute token transfer");
             // Swap from token to Bob
             (uint256 amountOutput) = swapExactInputMultihop(tokens, fees, amountOutMin, _amount);
+            // Deposit on ZK Bob protocol
             return(depositBob(amountOutput, _rawZkAddress, _fallbackUser));
         }
         else {
             // transfer from safe to Bob module
             bytes memory data = abi.encodeWithSignature("transfer(address,uint256)", address(this), _amount);
             require(safe.execTransactionFromModule(bobToken, 0, data, Enum.Operation.Call), "Could not execute token transfer");
+            // Deposit on ZK Bob protocol
             return(depositBob(_amount, _rawZkAddress, _fallbackUser));
         }
-
     }
 
     // Private function to calculate the next execution time for a payment schedule.
-    function _setNextExecution(uint256 interval) private view returns(uint256){
+    function _setNextExecution(
+        uint256 interval
+        ) 
+        private 
+        view 
+        returns(uint256)
+    {
         return(block.timestamp + interval);
     }
 
     // Private function to generate a random key. The key is a hash of multiple inputs to achieve high entropy.
-    function _randomKey(uint256 i) private view returns (bytes32) {
+    function _randomKey(
+        uint256 i
+        ) 
+        private 
+        view 
+        returns (bytes32) 
+    {
         return keccak256(abi.encode(i, block.timestamp, block.number, tx.origin, tx.gasprice, block.coinbase, block.prevrandao, msg.sender, blockhash(block.number - 5)));
     }
 
-    function getScheduledPayment(bytes32 paymentIndex) public view returns (ScheduledPayment memory) {
+    function _validateScheduledPaymentData(
+        uint256 amount, 
+        uint256 timeInterval, 
+        address paymentToken, 
+        uint256 payments, 
+        bytes memory _rawZkAddress
+        ) 
+        private 
+        pure 
+    {
+        // Check that amount is greater than zero
+        require(amount > 0, "Payment amount must be greater than zero.");
+
+        // Check that timeInterval is greater than zero
+        require(timeInterval > 0, "Time interval must be greater than zero.");
+
+        // Check that paymentToken is not a zero address
+        require(paymentToken != address(0), "Payment token address must not be zero.");
+
+        // Check that the number of payments is greater than zero
+        require(payments > 0, "Number of payments must be greater than zero.");
+
+        // Check that _rawZkAddress is not empty
+        require(_rawZkAddress.length > 0, "_rawZkAddress must not be empty.");
+    }
+
+    function getScheduledPayment(
+        bytes32 paymentIndex
+        ) 
+        public 
+        view 
+        returns (ScheduledPayment memory) 
+    {
         return (scheduledPayments[paymentIndex]);
     }
 
-    function isScheduledPaymentActive (bytes32 paymentIndex) public view returns (bool) {
+    function isScheduledPaymentActive(
+        bytes32 paymentIndex
+        ) 
+        public 
+        view 
+        returns (bool) 
+    {
         return (scheduledPayments[paymentIndex].active);
     }
 
-    function nextScheduledPayment (bytes32 paymentIndex) public view returns (uint256) {
+    function nextScheduledPayment(
+        bytes32 paymentIndex
+        ) 
+        public 
+        view 
+        returns (uint256) 
+    {
         return (scheduledPayments[paymentIndex].nextExecution);
     }
 }
