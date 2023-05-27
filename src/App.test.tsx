@@ -1,4 +1,4 @@
-import React, { render, screen } from './tests/utils'
+import { render, screen } from './tests/utils'
 import App from './App'
 
 test('renders learn loading screen', () => {
