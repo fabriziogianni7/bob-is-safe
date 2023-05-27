@@ -1,7 +1,4 @@
-import React from 'react'
-
 const CircleCrop = ({ imageUrl, altText, size }: any) => {
-
   const circleStyle = {
     width: size,
     height: size,

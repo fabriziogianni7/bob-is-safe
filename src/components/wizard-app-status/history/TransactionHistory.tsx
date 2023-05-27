@@ -1,8 +1,8 @@
 import React from 'react'
 import { Space, Table, Tag } from 'antd'
 import type { ColumnsType } from 'antd/es/table'
-import './../style.css'
-import CircleCrop from './CircleCrop'
+import '../../../style.css'
+import CircleCrop from '../../CircleCrop'
 
 interface DataType {
   key: string

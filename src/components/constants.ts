@@ -1,3 +1,10 @@
+export enum AppStatus {
+  INITIAL = 'initial',
+  TX_PENDING = 'txPending',
+  HISTORY = 'history',
+  TX_SUCCESS = 'txSuccess',
+}
+
 export interface Token {
   address: string
   decimals: number
