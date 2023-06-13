@@ -1,7 +1,7 @@
 import React from 'react'
 import { Form, Input, Select, Button, Space, Typography } from 'antd'
 import { Option } from 'antd/lib/mentions'
-import CircleCrop from "../../CircleCrop";
+import CircleCrop from '../../CircleCrop'
 
 const { Text } = Typography
 
@@ -50,18 +50,23 @@ export const PaymentForm: React.FC<PaymentFormProps> = ({
                 }}
                 labelAlign="right"
             >
-                <Form.Item name="Amount" style={{ borderRadius: '8px' }} rules={[{ required: true, message: 'Please enter an amount' }]}>
+                <Form.Item name="Amount" style={{ borderRadius: '8px' }}
+                           rules={[{ required: true, message: 'Please enter an amount' }]}>
                     <Input pattern="[0-9.]*" onKeyPress={(e) => {
                       const pattern = /[\d.]/
                       const inputChar = String.fromCharCode(e.charCode)
                       if (!pattern.test(inputChar)) {
                         e.preventDefault()
                       }
-                    }} onChange={(e) => { setAmount(e.target.value) }} placeholder="0"/>
+                    }} onChange={(e) => {
+                      setAmount(e.target.value)
+                    }} placeholder="0"/>
                 </Form.Item>
                 <Form.Item name="ZkBobAddress" style={{ borderRadius: '8px' }} rules={[{ required: true }]}>
                     <Input
-                        onChange={(e) => { setZkBobAddress(e.target.value) }}
+                        onChange={(e) => {
+                          setZkBobAddress(e.target.value)
+                        }}
                         placeholder="zkBob receiver address"
                     />
                 </Form.Item>
@@ -84,27 +89,27 @@ export const PaymentForm: React.FC<PaymentFormProps> = ({
                         ))}
                     </Select>
                 </Form.Item>
-                    <Button
-                        className="gradient-button"
-                        htmlType="submit"
-                        onClick={submitTx}
-                        style={{
-                          background: 'linear-gradient(to right, #ffbb33, #f7a10c)',
-                          color: 'white',
-                          fontWeight: 'bold',
-                          border: 'none',
-                          fontSize: '16px',
-                          textTransform: 'uppercase',
-                          borderRadius: '8px',
-                          boxShadow: '0 2px 6px rgba(0, 0, 0, 0.1)',
-                          width: '360px',
-                          height: '48px',
-                          marginTop: '12px',
-                          marginBottom: '0px !important'
-                        }}
-                    >
-                        Transfer
-                    </Button>
+                <Button
+                    className="gradient-button"
+                    htmlType="submit"
+                    onClick={submitTx}
+                    style={{
+                      background: 'linear-gradient(to right, #ffbb33, #f7a10c)',
+                      color: 'white',
+                      fontWeight: 'bold',
+                      border: 'none',
+                      fontSize: '16px',
+                      textTransform: 'uppercase',
+                      borderRadius: '8px',
+                      boxShadow: '0 2px 6px rgba(0, 0, 0, 0.1)',
+                      width: '360px',
+                      height: '48px',
+                      marginTop: '12px',
+                      marginBottom: '0px !important'
+                    }}
+                >
+                    Transfer
+                </Button>
             </Form>
         </div>
   )

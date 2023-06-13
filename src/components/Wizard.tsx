@@ -1,6 +1,5 @@
 import Safe, { EthersAdapter } from '@safe-global/protocol-kit'
 import { useSafeAppsSDK } from '@safe-global/safe-apps-react-sdk'
-import {  Typography } from 'antd'
 import { ethers } from 'ethers'
 import React, { useCallback, useContext, useEffect, useState } from 'react'
 import safeAbi from '../contracts-abi/safe-abi.json'
@@ -14,17 +13,15 @@ import { Web3Context } from '../context'
 import Chronology from './wizard-app-status/history/Chronology'
 import TransactionSuccess from './wizard-app-status/TransactionSuccess'
 
-const { Text, Link } = Typography
-
 const Wizard: React.FC = () => {
-  const {  safe } = useSafeAppsSDK()
+  const { safe } = useSafeAppsSDK()
   const { appStatus, setStatus } = useContext(Web3Context)
 
   const [isModuleEnabled, setIsModuleEnabled] = useState<boolean | null>(false)
 
   useEffect(() => {
     if (!isModuleEnabled) {
-      _setIsModuleEnabled()
+      _setIsModuleEnabled().then(r => { console.log('module enabled') })
     }
   }, [isModuleEnabled, safe.safeAddress])
 

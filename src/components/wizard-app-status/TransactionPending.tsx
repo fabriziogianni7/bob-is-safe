@@ -1,4 +1,4 @@
-import { Alert, Card, Spin } from 'antd'
+import { Alert, Spin } from 'antd'
 import React from 'react'
 
 const TransactionPending = ({ isModuleEnabled }: any) => {

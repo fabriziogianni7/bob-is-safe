@@ -23,9 +23,9 @@ module.exports = {
     '@typescript-eslint/no-misused-promises': 'off',
     'react/react-in-jsx-scope': 'off',
     '@typescript-eslint/triple-slash-reference': 'off',
-    '@typescript-eslint/consistent-type-assertions': 'off',
+    '@typescript-eslint/consistent-type-assertions': 'error',
     '@typescript-eslint/restrict-template-expressions': 'off',
-    '@typescript-eslint/no-unused-vars': 'warn',
+    '@typescript-eslint/no-unused-vars': 'error',
     '@typescript-eslint/no-floating-promises': 'off'
   }
 }

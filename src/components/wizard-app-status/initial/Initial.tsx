@@ -10,7 +10,7 @@ import safeAbi from '../../../contracts-abi/safe-abi.json'
 
 import { removeZkbobNetworkPrefix } from '../../helpers'
 import { Web3Context } from '../../../context'
-const { Text, Link } = Typography
+const { Text } = Typography
 
 const Initial = ({ isModuleEnabled }: any) => {
   const [form] = Form.useForm()
@@ -26,7 +26,7 @@ const Initial = ({ isModuleEnabled }: any) => {
       const module = localStorage.getItem('moduleAddress')
       if (module) {
         const token = TOKEN_OPTIONS[tokenIndex]
-        const { safeTxHash } = await sdk.txs.send({
+        await sdk.txs.send({
           txs: [
             {
               to: module,
@@ -78,7 +78,7 @@ const Initial = ({ isModuleEnabled }: any) => {
     const factoryContractFilters = factoryContract.filters.ModuleProxyCreation()
     factoryContract.on(factoryContractFilters, (address, y) => {
       localStorage.setItem('moduleAddress', address)
-      enableZKModule(address)
+      void enableZKModule(address)
     })
 
     const deployModule = await factoryContract.createModule(
