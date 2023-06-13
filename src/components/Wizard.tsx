@@ -8,8 +8,8 @@ import moduleAbi from '../contracts-abi/module-abi.json'
 import {
   AppStatus
 } from './constants'
-import TransactionPending from './TransactionPending'
-import Initial from './wizard-app-status/Initial'
+import TransactionPending from './wizard-app-status/TransactionPending'
+import Initial from './wizard-app-status/initial/Initial'
 import { Web3Context } from '../context'
 import Chronology from './wizard-app-status/history/Chronology'
 import TransactionSuccess from './wizard-app-status/TransactionSuccess'

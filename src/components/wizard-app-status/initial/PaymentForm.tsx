@@ -1,7 +1,7 @@
 import React from 'react'
 import { Form, Input, Select, Button, Space, Typography } from 'antd'
 import { Option } from 'antd/lib/mentions'
-import CircleCrop from './CircleCrop'
+import CircleCrop from "../../CircleCrop";
 
 const { Text } = Typography
 
